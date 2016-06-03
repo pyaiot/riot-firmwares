@@ -32,7 +32,6 @@ coap_rw_buffer_t scratch_buf = { scratch_raw, sizeof(scratch_raw) };
  */
 void microcoap_server_loop(void)
 {
-
     uint8_t laddr[16] = { 0 };
     uint8_t raddr[16] = { 0 };
     size_t raddr_len;

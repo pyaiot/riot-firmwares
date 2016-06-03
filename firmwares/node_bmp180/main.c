@@ -20,6 +20,8 @@
 #include <stdio.h>
 #include "msg.h"
 #include "xtimer.h"
+#include "bmp180.h"
+#include "board.h"
 
 #define MAIN_QUEUE_SIZE     (8)
 static msg_t _main_msg_queue[MAIN_QUEUE_SIZE];
@@ -30,12 +32,12 @@ void microcoap_server_loop(void);
 extern int _netif_config(int argc, char **argv);
 
 int main(void)
-{
+{   
     puts("RIOT microcoap example application");
 
     /* microcoap_server uses conn which uses gnrc which needs a msg queue */
     msg_init_queue(_main_msg_queue, MAIN_QUEUE_SIZE);
-
+    
     puts("Waiting for address autoconfiguration...");
     xtimer_sleep(3);
 
