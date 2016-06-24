@@ -129,7 +129,13 @@ static int handle_get_well_known_core(coap_rw_buffer_t *scratch,
         ep++;
     }
 
-    strncat(rsp, "]}", 2);
+    strncat(rsp, "],\"board\":\"", 11);
+    len -= 11;
+
+    strncat(rsp, RIOT_BOARD, strlen(RIOT_BOARD));
+    len -= strlen(RIOT_BOARD);
+    
+    strncat(rsp, "\"}", 2);
     len -= 2;
 
     return coap_make_response(scratch, outpkt, (const uint8_t *)rsp,
