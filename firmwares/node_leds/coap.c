@@ -73,11 +73,16 @@ static int handle_get_well_known_core(coap_rw_buffer_t *scratch,
         uint8_t id_hi, uint8_t id_lo)
 {
     char *rsp = (char *)response;
+    // resetting the content of response message
+    memset(response, 0, sizeof(response));
     int len = sizeof(response);
     const coap_endpoint_t *ep = endpoints;
     int i;
 
     len--; // Null-terminated string
+
+    strncat(rsp, "{\"paths\":[", 10);
+    len -= 10;
 
     while (NULL != ep->handler) {
         if (NULL == ep->core_attr) {
@@ -85,30 +90,47 @@ static int handle_get_well_known_core(coap_rw_buffer_t *scratch,
             continue;
         }
 
-        if (0 < strlen(rsp)) {
-            strncat(rsp, ",", len);
+        if (10 < strlen(rsp)) {
+            strncat(rsp, ",", 1);
             len--;
         }
 
-        strncat(rsp, "<", len);
-        len--;
+        strncat(rsp, "{\"path\":\"", 9);
+        len-=9;
 
         for (i = 0; i < ep->path->count; i++) {
-            strncat(rsp, "/", len);
+            strncat(rsp, "/", 1);
             len--;
 
             strncat(rsp, ep->path->elems[i], len);
             len -= strlen(ep->path->elems[i]);
         }
 
-        strncat(rsp, ">;", len);
+        strncat(rsp, "\",", 2);
         len -= 2;
 
-        strncat(rsp, ep->core_attr, len);
-        len -= strlen(ep->core_attr);
-
+        strncat(rsp, "\"method\":", 9);
+        len-=9;
+        switch (ep->method) {
+        case COAP_METHOD_GET:
+            strncat(rsp, "\"GET\"", 5);
+            len -= 5;
+            break;
+        case COAP_METHOD_PUT:
+            strncat(rsp, "\"PUT\"", 5);
+            len -= 5;
+            break;
+        default:
+            break;
+        }
+        
+        strncat(rsp, "}", 1);
+        len--;
         ep++;
     }
+
+    strncat(rsp, "]}", 2);
+    len -= 2;
 
     return coap_make_response(scratch, outpkt, (const uint8_t *)rsp,
                               strlen(rsp), id_hi, id_lo, &inpkt->tok,
@@ -135,10 +157,10 @@ static int handle_get_riot_mcu(coap_rw_buffer_t *scratch,
                                coap_packet_t *outpkt,
                                uint8_t id_hi, uint8_t id_lo)
 {
-    const char *riot_name = RIOT_MCU;
+    const char *riot_mcu = RIOT_MCU;
     int len = strlen(RIOT_MCU);
     
-    memcpy(response, riot_name, len);
+    memcpy(response, riot_mcu, len);
     
     return coap_make_response(scratch, outpkt, (const uint8_t *)response, len,
                               id_hi, id_lo, &inpkt->tok, COAP_RSPCODE_CONTENT,
