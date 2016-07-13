@@ -41,7 +41,7 @@ void microcoap_server_loop(void);
 extern int _netif_config(int argc, char **argv);
 
 /* broker  */
-static const ipv6_addr_t broker_addr = {{ 0x20, 0xa1, 0x04, 0xf8, \
+static const ipv6_addr_t broker_addr = {{ 0x2a, 0x01, 0x04, 0xf8, \
                                           0x0c, 0x17, 0x3f, 0xd8, \
                                           0x00, 0x00, 0x00, 0x00, \
                                           0x00, 0x00, 0x00, 0x02 }};
