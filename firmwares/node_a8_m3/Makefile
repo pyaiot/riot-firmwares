@@ -1,5 +1,5 @@
 # name of your application
-APPLICATION = microcoap_server
+APPLICATION = dashboard_riot_a8_m3 
 
 # Use IoT-LAB board:
 BOARD = iotlab-a8-m3 
@@ -23,7 +23,7 @@ USEMODULE += gnrc_udp
 USEMODULE += gnrc_rpl
 # Additional networking modules that can be dropped if not needed
 USEMODULE += gnrc_icmpv6_echo
-
+USEMODULE += printf_float
 #
 USEMODULE += gnrc_conn_udp
 

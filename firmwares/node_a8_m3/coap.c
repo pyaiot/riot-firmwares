@@ -161,7 +161,7 @@ static int handle_get_temperature(coap_rw_buffer_t *scratch,
     _init_device();
     memset(temperature, 0, sizeof(temperature));
     lsm303dlhc_read_temp(&lsm303dlhc_dev, &temp);
-    sprintf(temperature, "%i°C", temp);
+    sprintf(temperature, "%.1f°C", (double)temp/128.0);
 
     memcpy(response, temperature,  strlen(temperature));
 
