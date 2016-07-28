@@ -2,7 +2,7 @@
 APPLICATION = dashboard_riot_a8_m3 
 
 # Use IoT-LAB board:
-BOARD = iotlab-a8-m3 
+BOARD ?= iotlab-a8-m3
 
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../..
