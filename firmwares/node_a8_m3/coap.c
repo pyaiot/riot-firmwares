@@ -208,12 +208,10 @@ static int handle_put_led(coap_rw_buffer_t *scratch,
 {
   coap_responsecode_t resp = COAP_RSPCODE_CHANGED;
 
-  /* On vérifie que la valeur donnée est correcte (0 ou 1)*/
   uint8_t val = inpkt->payload.p[0];
   if ((inpkt->payload.len == 1) &&
     ((val == '1') || (val == '0'))) {
-    /* écriture de la nouvelle valeur de la led */
-    gpio_write(LED0_PIN, (val - '1'));
+    gpio_write(LED0_PIN, ('1' - val));
   }
   else {
     resp = COAP_RSPCODE_BAD_REQUEST;
