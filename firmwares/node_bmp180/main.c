@@ -41,10 +41,10 @@ void microcoap_server_loop(void);
 extern int _netif_config(int argc, char **argv);
 
 /* broker  */
-static const ipv6_addr_t broker_addr = {{ 0x20, 0x01, 0x04, 0x70, \
-                                          0x1f, 0x12, 0x01, 0x5e, \
+static const ipv6_addr_t broker_addr = {{ 0xfd, 0x00, 0xab, 0xad, \
+                                          0x00, 0x1e, 0x01, 0x02, \
                                           0x00, 0x00, 0x00, 0x00, \
-                                          0x00, 0x00, 0x00, 0x02 }};
+                                          0x00, 0x00, 0x00, 0x01 }};
 static uint16_t BROKER_PORT = 8888;
 
 static void *beaconing_thread(void *args)
