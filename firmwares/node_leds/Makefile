@@ -1,5 +1,5 @@
 # name of your application
-APPLICATION = microcoap_server
+APPLICATION = node_leds
 
 # If no BOARD is found in the environment, use this default:
 BOARD ?= native
@@ -32,6 +32,7 @@ CFLAGS += -DMICROCOAP_DEBUG
 
 # include this for printing IP addresses
 USEMODULE += shell_commands
+USEMODULE += xtimer
 
 FEATURES_REQUIRED += periph_gpio
 
