@@ -2,15 +2,10 @@
 APPLICATION = node_leds_xbee 
 
 # If no BOARD is found in the environment, use this default:
-BOARD ?= native
+BOARD = arduino-zero
 
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../..
-
-BOARD_INSUFFICIENT_MEMORY := airfy-beacon chronos msb-430 msb-430h nrf51dongle \
-                          nrf6310 pca10000 pca10005 spark-core \
-                          stm32f0discovery telosb weio wsn430-v1_3b wsn430-v1_4 \
-                          yunjia-nrf51822 z1 nucleo-f072
 
 ## Uncomment to support the XBee module and nomac
 USEMODULE += xbee
@@ -38,8 +33,6 @@ USEMODULE += gnrc_udp
 USEMODULE += gnrc_rpl
 # Additional networking modules that can be dropped if not needed
 USEMODULE += gnrc_icmpv6_echo
-
-#
 USEMODULE += gnrc_conn_udp
 
 USEPKG += microcoap
@@ -52,24 +45,17 @@ USEMODULE += shell_commands
 DEFAULT_CHANNEL ?= 26
 CFLAGS += -DDEFAULT_CHANNEL=$(DEFAULT_CHANNEL)
 
+# CoAP broker server information
+BROKER_ADDR ?= \"2001:660:3207:102::4\"
+BROKER_PORT ?= 8888
+
+CFLAGS += -DBROKER_ADDR=$(BROKER_ADDR) -DBROKER_PORT=$(BROKER_PORT)
+
+
 # Comment this out to disable code in RIOT that does safety checking
 # which is not needed in a production environment but helps in the
 # development process:
 #CFLAGS += -DDEVELHELP
-
-# Use different settings when compiling for one of the following (low-memory)
-# boards
-LOW_MEMORY_BOARDS := nucleo-f334
-
-ifneq (,$(filter $(BOARD),$(LOW_MEMORY_BOARDS)))
-$(info Using low-memory configuration for microcoap_server.)
-## low-memory tuning values
-# lower pktbuf buffer size
-CFLAGS += -DGNRC_PKTBUF_SIZE=1000
-# disable fib, rpl
-DISABLE_MODULE += fib gnrc_rpl
-USEMODULE += prng_minstd
-endif
 
 # Change this to 0 show compiler invocation lines by default:
 QUIET ?= 1
