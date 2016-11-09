@@ -54,6 +54,16 @@ static int handle_get_well_known_core(coap_rw_buffer_t *scratch,
                                       coap_packet_t *outpkt,
                                       uint8_t id_hi, uint8_t id_lo);
 
+static int handle_get_board(coap_rw_buffer_t *scratch,
+                            const coap_packet_t *inpkt,
+                            coap_packet_t *outpkt,
+                            uint8_t id_hi, uint8_t id_lo);
+
+static int handle_get_mcu(coap_rw_buffer_t *scratch,
+                          const coap_packet_t *inpkt,
+                          coap_packet_t *outpkt,
+                          uint8_t id_hi, uint8_t id_lo);
+
 static int handle_get_temperature(coap_rw_buffer_t *scratch,
                                   const coap_packet_t *inpkt,
                                   coap_packet_t *outpkt,
@@ -62,6 +72,12 @@ static int handle_get_temperature(coap_rw_buffer_t *scratch,
 static const coap_endpoint_path_t path_well_known_core =
         { 2, { ".well-known", "core" } };
 
+static const coap_endpoint_path_t path_board =
+        { 1, { "board" } };
+
+static const coap_endpoint_path_t path_mcu =
+        { 1, { "mcu" } };
+
 static const coap_endpoint_path_t path_temperature =
         { 1, { "temperature" } };
 
@@ -69,6 +85,10 @@ const coap_endpoint_t endpoints[] =
 {
     { COAP_METHOD_GET,	handle_get_well_known_core,
       &path_well_known_core, "ct=40" },
+    { COAP_METHOD_GET,	handle_get_board,
+      &path_board,	   "ct=0"  },
+    { COAP_METHOD_GET,	handle_get_mcu,
+      &path_mcu,	   "ct=0"  },
     { COAP_METHOD_GET,	handle_get_temperature,
       &path_temperature,   "ct=0"  },
     /* marks the end of the endpoints array: */
@@ -102,16 +122,13 @@ static int handle_get_well_known_core(coap_rw_buffer_t *scratch,
                                       uint8_t id_hi, uint8_t id_lo)
 {
     char *rsp = (char *)response;
-    // resetting the content of response message
+    /* resetting the content of response message */
     memset(response, 0, sizeof(response));
-    int len = sizeof(response);
+    size_t len = sizeof(response);
     const coap_endpoint_t *ep = endpoints;
     int i;
 
     len--; // Null-terminated string
-
-    strncat(rsp, "{\"paths\":[", 10);
-    len -= 10;
 
     while (NULL != ep->handler) {
         if (NULL == ep->core_attr) {
@@ -119,58 +136,65 @@ static int handle_get_well_known_core(coap_rw_buffer_t *scratch,
             continue;
         }
 
-        if (10 < strlen(rsp)) {
-            strncat(rsp, ",", 1);
+        if (0 < strlen(rsp)) {
+            strncat(rsp, ",", len);
             len--;
         }
 
-        strncat(rsp, "{\"path\":\"", 9);
-        len-=9;
+        strncat(rsp, "<", len);
+        len--;
 
         for (i = 0; i < ep->path->count; i++) {
-            strncat(rsp, "/", 1);
+            strncat(rsp, "/", len);
             len--;
 
             strncat(rsp, ep->path->elems[i], len);
             len -= strlen(ep->path->elems[i]);
         }
 
-        strncat(rsp, "\",", 2);
+        strncat(rsp, ">;", len);
         len -= 2;
 
-        strncat(rsp, "\"method\":", 9);
-        len-=9;
-        switch (ep->method) {
-        case COAP_METHOD_GET:
-            strncat(rsp, "\"GET\"", 5);
-            len -= 5;
-            break;
-        case COAP_METHOD_PUT:
-            strncat(rsp, "\"PUT\"", 5);
-            len -= 5;
-            break;
-        default:
-            break;
-        }
-        
-        strncat(rsp, "}", 1);
-        len--;
+        strncat(rsp, ep->core_attr, len);
+        len -= strlen(ep->core_attr);
+
         ep++;
     }
-
-    strncat(rsp, "],\"board\":\"", 11);
-    len -= 11;
-
-    strncat(rsp, RIOT_BOARD, strlen(RIOT_BOARD));
-    len -= strlen(RIOT_BOARD);
-    
-    strncat(rsp, "\"}", 2);
-    len -= 2;
     
     return coap_make_response(scratch, outpkt, (const uint8_t *)rsp,
                               strlen(rsp), id_hi, id_lo, &inpkt->tok,
                               COAP_RSPCODE_CONTENT,
                               COAP_CONTENTTYPE_APPLICATION_LINKFORMAT);
+}
+
+static int handle_get_board(coap_rw_buffer_t *scratch,
+                            const coap_packet_t *inpkt,
+                            coap_packet_t *outpkt,
+                            uint8_t id_hi, uint8_t id_lo)
+{
+    const char *riot_name = RIOT_BOARD;
+    int len = strlen(RIOT_BOARD);
+
+    memcpy(response, riot_name, len);
+
+    return coap_make_response(scratch, outpkt, (const uint8_t *)response, len,
+                              id_hi, id_lo, &inpkt->tok, COAP_RSPCODE_CONTENT,
+                              COAP_CONTENTTYPE_TEXT_PLAIN);
+}
+
+static int handle_get_mcu(coap_rw_buffer_t *scratch,
+                          const coap_packet_t *inpkt,
+                          coap_packet_t *outpkt,
+                          uint8_t id_hi, uint8_t id_lo)
+{
+    const char *riot_mcu = RIOT_MCU;
+    int len = strlen(RIOT_MCU);
+    
+    memcpy(response, riot_mcu, len);
+    
+    return coap_make_response(scratch, outpkt, (const uint8_t *)response, len,
+                              id_hi, id_lo, &inpkt->tok, COAP_RSPCODE_CONTENT,
+                              COAP_CONTENTTYPE_TEXT_PLAIN);
 }
 
 static int handle_get_temperature(coap_rw_buffer_t *scratch,
