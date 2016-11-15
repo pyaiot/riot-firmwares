@@ -6,20 +6,20 @@
  * directory for more details.
  */
 
-#include <coap.h>
+#include <stdlib.h>
 #include <string.h>
+#include <coap.h>
 
 #include "board.h"
 #include "periph/gpio.h"
-
-#include "saul_reg.h"
 
 #define MAX_RESPONSE_LEN 500
 static uint8_t response[MAX_RESPONSE_LEN] = { 0 };
 
 static char payload[512];
-static phydat_t data[3];
-static const char *types[] = {"acc", "mag", "gyro"};
+
+extern void _read_imu(char* payload);
+extern void _send_coap_post(uint8_t* uri_path, uint8_t *data);
 
 static int handle_get_well_known_core(coap_rw_buffer_t *scratch,
                                       const coap_packet_t *inpkt,
@@ -170,7 +170,7 @@ static int handle_get_led(coap_rw_buffer_t *scratch,
                           uint8_t id_hi, uint8_t id_lo)
 {
     char led_status[1];
-    sprintf(led_status, "%d", 1 - gpio_read(LED0_PIN));
+    sprintf(led_status, "%d", gpio_read(LED0_PIN) == 0);
     memcpy(response, led_status, 1);
     
     return coap_make_response(scratch, outpkt, (const uint8_t *)response, 1,
@@ -183,24 +183,31 @@ static int handle_put_led(coap_rw_buffer_t *scratch,
                           coap_packet_t *outpkt,
                           uint8_t id_hi, uint8_t id_lo)
 {
-  coap_responsecode_t resp = COAP_RSPCODE_CHANGED;
+    coap_responsecode_t resp = COAP_RSPCODE_CHANGED;
   
-  /* On vérifie que la valeur donnée est correcte (0 ou 1)*/
-  uint8_t val = inpkt->payload.p[0];
-  if ((inpkt->payload.len == 1) &&
-    ((val == '1') || (val == '0'))) {
-    /* écriture de la nouvelle valeur de la led */
-    gpio_write(LED0_PIN, (val - '1'));
-  }
-  else {
-    resp = COAP_RSPCODE_BAD_REQUEST;
-  }
-
-  /* Réponse faite au client */
-  return coap_make_response(scratch, outpkt, NULL, 0,
-                            id_hi, id_lo,
-                            &inpkt->tok, resp,
-                            COAP_CONTENTTYPE_TEXT_PLAIN);
+    /* Check input data is valid */
+    uint8_t val = strtol((char*)inpkt->payload.p, NULL, 10);
+    if ((inpkt->payload.len == 1) &&
+            ((val == 1) || (val == 0))) {
+        /* update LED value */
+        gpio_write(LED0_PIN, 1 - val);
+    }
+    else {
+        resp = COAP_RSPCODE_BAD_REQUEST;
+    }
+    
+    /* Reply to server */
+    int result = coap_make_response(scratch, outpkt, NULL, 0,
+                                    id_hi, id_lo,
+                                    &inpkt->tok, resp,
+                                    COAP_CONTENTTYPE_TEXT_PLAIN);
+    
+    /* Send post notification to server */
+    char led_status[1];
+    sprintf(led_status, "led:%d", gpio_read(LED0_PIN) == 0);
+    _send_coap_post((uint8_t*)"server", (uint8_t*)led_status);
+    
+    return result;
 }
 
 
@@ -208,30 +215,8 @@ static int handle_get_imu(coap_rw_buffer_t *scratch,
                           const coap_packet_t *inpkt,
                           coap_packet_t *outpkt,
                           uint8_t id_hi, uint8_t id_lo)
-{
-    /* get sensors */
-    saul_reg_t *acc = saul_reg_find_type(SAUL_SENSE_ACCEL);
-    saul_reg_t *mag = saul_reg_find_type(SAUL_SENSE_MAG);
-    saul_reg_t *gyr = saul_reg_find_type(SAUL_SENSE_GYRO);
-    if ((acc == NULL) || (mag == NULL) || (gyr == NULL)) {
-        puts("Unable to find sensors");
-        return 1;
-    }
-
-    saul_reg_read(acc, &data[0]);
-    saul_reg_read(mag, &data[1]);
-    saul_reg_read(gyr, &data[2]);
-
-    size_t p = 0;
-    p += sprintf(&payload[p], "[");
-    for (int i = 0; i < 3; i++) {
-        p += sprintf(&payload[p],
-                     "{\"type\":\"%s\", \"values\":[%i, %i, %i]},",
-                     types[i], (int)data[i].val[0], (int)data[i].val[1], (int)data[i].val[2]);
-    }
-    p--;
-    p += sprintf(&payload[p], "]");
-    payload[p] = '\0';
+{    
+    _read_imu(payload);
 
     int len = strlen(payload);
     memcpy(response, payload, len);
