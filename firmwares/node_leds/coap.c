@@ -13,6 +13,8 @@
 #include "board.h"
 #include "periph/gpio.h"
 
+extern void _send_coap_post(uint8_t* uri_path, uint8_t *data);
+
 #define MAX_RESPONSE_LEN 500
 static uint8_t response[MAX_RESPONSE_LEN] = { 0 };
 
@@ -42,16 +44,16 @@ static int handle_put_led(coap_rw_buffer_t *scratch,
                           uint8_t id_hi, uint8_t id_lo);
 
 static const coap_endpoint_path_t path_well_known_core =
-        { 2, { ".well-known", "core" } };
+{ 2, { ".well-known", "core" } };
 
 static const coap_endpoint_path_t path_board =
-        { 1, { "board" } };
+{ 1, { "board" } };
 
 static const coap_endpoint_path_t path_mcu =
-        { 1, { "mcu" } };
+{ 1, { "mcu" } };
 
 static const coap_endpoint_path_t path_led =
-        { 1, { "led" } };
+{ 1, { "led" } };
 
 const coap_endpoint_t endpoints[] =
 {
@@ -70,8 +72,8 @@ const coap_endpoint_t endpoints[] =
 };
 
 static int handle_get_well_known_core(coap_rw_buffer_t *scratch,
-        const coap_packet_t *inpkt, coap_packet_t *outpkt,
-        uint8_t id_hi, uint8_t id_lo)
+                                      const coap_packet_t *inpkt, coap_packet_t *outpkt,
+                                      uint8_t id_hi, uint8_t id_lo)
 {
     char *rsp = (char *)response;
     /* resetting the content of response message */
@@ -79,40 +81,40 @@ static int handle_get_well_known_core(coap_rw_buffer_t *scratch,
     size_t len = sizeof(response);
     const coap_endpoint_t *ep = endpoints;
     int i;
-
+    
     len--; // Null-terminated string
-
+    
     while (NULL != ep->handler) {
         if (NULL == ep->core_attr) {
             ep++;
             continue;
         }
-
+        
         if (0 < strlen(rsp)) {
             strncat(rsp, ",", len);
             len--;
         }
-
+        
         strncat(rsp, "<", len);
         len--;
-
+        
         for (i = 0; i < ep->path->count; i++) {
             strncat(rsp, "/", len);
             len--;
-
+            
             strncat(rsp, ep->path->elems[i], len);
             len -= strlen(ep->path->elems[i]);
         }
-
+        
         strncat(rsp, ">;", len);
         len -= 2;
-
+        
         strncat(rsp, ep->core_attr, len);
         len -= strlen(ep->core_attr);
-
+        
         ep++;
     }
-
+    
     return coap_make_response(scratch, outpkt, (const uint8_t *)rsp,
                               strlen(rsp), id_hi, id_lo, &inpkt->tok,
                               COAP_RSPCODE_CONTENT,
@@ -126,9 +128,9 @@ static int handle_get_board(coap_rw_buffer_t *scratch,
 {
     const char *riot_name = RIOT_BOARD;
     int len = strlen(RIOT_BOARD);
-
+    
     memcpy(response, riot_name, len);
-
+    
     return coap_make_response(scratch, outpkt, (const uint8_t *)response, len,
                               id_hi, id_lo, &inpkt->tok, COAP_RSPCODE_CONTENT,
                               COAP_CONTENTTYPE_TEXT_PLAIN);
@@ -167,23 +169,30 @@ static int handle_put_led(coap_rw_buffer_t *scratch,
                           const coap_packet_t *inpkt,
                           coap_packet_t *outpkt,
                           uint8_t id_hi, uint8_t id_lo)
-{
-  coap_responsecode_t resp = COAP_RSPCODE_CHANGED;
-  
-  /* On vérifie que la valeur donnée est correcte (0 ou 1)*/
-  uint8_t val = strtol((char*)inpkt->payload.p, NULL, 10);
-  if ((inpkt->payload.len == 1) &&
-    ((val == 1) || (val == 0))) {
-    /* écriture de la nouvelle valeur de la led */
-    gpio_write(LED0_PIN, val - 1);
-  }
-  else {
-    resp = COAP_RSPCODE_BAD_REQUEST;
-  }
+{   
+    coap_responsecode_t resp = COAP_RSPCODE_CHANGED;
 
-  /* Réponse faite au client */
-  return coap_make_response(scratch, outpkt, NULL, 0,
-                            id_hi, id_lo,
-                            &inpkt->tok, resp,
-                            COAP_CONTENTTYPE_TEXT_PLAIN);
+    /* Check input data is valid */
+    uint8_t val = strtol((char*)inpkt->payload.p, NULL, 10);
+    if ((inpkt->payload.len == 1) &&
+            ((val == 1) || (val == 0))) {
+        /* update LED value */
+        gpio_write(LED0_PIN, val - 1);
+    }
+    else {
+        resp = COAP_RSPCODE_BAD_REQUEST;
+    }
+    
+    /* Reply to server */
+    int result = coap_make_response(scratch, outpkt, NULL, 0,
+                                    id_hi, id_lo,
+                                    &inpkt->tok, resp,
+                                    COAP_CONTENTTYPE_TEXT_PLAIN);
+    
+    /* Send post notification to server */
+    char led_status[1];
+    sprintf(led_status, "led:%d", 1 - gpio_read(LED0_PIN));
+    _send_coap_post((uint8_t*)"server", (uint8_t*)led_status);
+    
+    return result;
 }
