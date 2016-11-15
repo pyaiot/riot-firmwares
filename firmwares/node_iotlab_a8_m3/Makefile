@@ -32,9 +32,8 @@ USEMODULE += lsm303dlhc
 
 # CoAP broker server information
 BROKER_ADDR ?= 2001:660:3207:102::4
-BROKER_PORT ?= 8888
 
-CFLAGS += -DBROKER_ADDR=\"$(BROKER_ADDR)\" -DBROKER_PORT=$(BROKER_PORT)
+CFLAGS += -DBROKER_ADDR=\"$(BROKER_ADDR)\"
 
 # Change this to 0 show compiler invocation lines by default:
 QUIET ?= 1

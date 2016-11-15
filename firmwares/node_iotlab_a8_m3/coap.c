@@ -6,9 +6,9 @@
  * directory for more details.
  */
 
-#include <coap.h>
+#include <stdlib.h>
 #include <string.h>
-
+#include <coap.h>
 #include "board.h"
 #include "periph_conf.h"
 #include "lsm303dlhc.h"
@@ -22,6 +22,8 @@ static bool initialized = 0;
 static uint8_t response[MAX_RESPONSE_LEN] = { 0 };
 
 static char temperature[15];
+
+extern void _send_coap_post(uint8_t* uri_path, uint8_t *data);
 
 static int handle_get_well_known_core(coap_rw_buffer_t *scratch,
                                       const coap_packet_t *inpkt,
@@ -230,20 +232,29 @@ static int handle_put_led(coap_rw_buffer_t *scratch,
                           coap_packet_t *outpkt,
                           uint8_t id_hi, uint8_t id_lo)
 {
-  coap_responsecode_t resp = COAP_RSPCODE_CHANGED;
-
-  uint8_t val = inpkt->payload.p[0];
-  if ((inpkt->payload.len == 1) &&
-    ((val == '1') || (val == '0'))) {
-    gpio_write(LED0_PIN, ('1' - val));
-  }
-  else {
-    resp = COAP_RSPCODE_BAD_REQUEST;
-  }
-
-  /* Réponse faite au client */
-  return coap_make_response(scratch, outpkt, NULL, 0,
-                            id_hi, id_lo,
-                            &inpkt->tok, resp,
-                            COAP_CONTENTTYPE_TEXT_PLAIN);
+    coap_responsecode_t resp = COAP_RSPCODE_CHANGED;
+  
+    /* Check input data is valid */
+    uint8_t val = strtol((char*)inpkt->payload.p, NULL, 10);
+    if ((inpkt->payload.len == 1) &&
+            ((val == 1) || (val == 0))) {
+        /* update LED value */
+        gpio_write(LED0_PIN, val);
+    }
+    else {
+        resp = COAP_RSPCODE_BAD_REQUEST;
+    }
+    
+    /* Reply to server */
+    int result = coap_make_response(scratch, outpkt, NULL, 0,
+                                    id_hi, id_lo,
+                                    &inpkt->tok, resp,
+                                    COAP_CONTENTTYPE_TEXT_PLAIN);
+    
+    /* Send post notification to server */
+    char led_status[1];
+    sprintf(led_status, "led:%d", gpio_read(LED0_PIN));
+    _send_coap_post((uint8_t*)"server", (uint8_t*)led_status);
+    
+    return result;
 }

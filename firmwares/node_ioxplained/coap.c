@@ -15,7 +15,6 @@
 
 #define MAX_RESPONSE_LEN 500
 #define I2C_INTERFACE I2C_DEV(0)    /* I2C interface number */
-#define SENSOR_ADDR   (0x48 | 0x07) /* I2C temperature address on sensor */
 
 static bool initialized = 0;
 
@@ -23,31 +22,7 @@ static uint8_t response[MAX_RESPONSE_LEN] = { 0 };
 
 static char temperature[15];
 
-static int read_temperature(void)
-{
-    uint16_t temperature;
-    char buffer[2] = { 0 };
-    /* read temperature register on I2C bus */
-    if (i2c_read_bytes(I2C_INTERFACE, SENSOR_ADDR, buffer, 2) < 0) {
-	printf("Error: cannot read at address %i on I2C interface %i\n",
-	       SENSOR_ADDR, I2C_INTERFACE);
-	return -1;
-    }
-    
-    uint16_t data = (buffer[0] << 8) | buffer[1];
-    int8_t sign = 1;
-    /* Check if negative and clear sign bit. */
-    if (data & (1 << 15)) {
-	sign *= -1;
-	data &= ~(1 << 15);
-    }
-    /* Convert to temperature */
-    data = (data >> 5);
-    temperature = data * sign * 0.125;
-    
-    return (int)temperature;
-}
-
+extern int _read_temperature(void);
 
 static int handle_get_well_known_core(coap_rw_buffer_t *scratch,
                                       const coap_packet_t *inpkt,
@@ -204,7 +179,7 @@ static int handle_get_temperature(coap_rw_buffer_t *scratch,
 {
     _init_device();
     memset(temperature, 0, sizeof(temperature));
-    sprintf(temperature, "%i°C", read_temperature());
+    sprintf(temperature, "%i°C", _read_temperature());
 
     memcpy(response, temperature,  strlen(temperature));
 
