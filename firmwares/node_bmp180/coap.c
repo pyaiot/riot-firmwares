@@ -237,6 +237,8 @@ static int handle_put_led(coap_rw_buffer_t *scratch,
 
     /* Check input data is valid */
     uint8_t val = strtol((char*)inpkt->payload.p, NULL, 10);
+    bool changed = (val == (1 - gpio_read(LED0_PIN)));
+
     if ((inpkt->payload.len == 1) &&
             ((val == 1) || (val == 0))) {
         /* update LED value */
@@ -252,10 +254,12 @@ static int handle_put_led(coap_rw_buffer_t *scratch,
                                     &inpkt->tok, resp,
                                     COAP_CONTENTTYPE_TEXT_PLAIN);
     
-    /* Send post notification to server */
-    char led_status[1];
-    sprintf(led_status, "led:%d", 1 - gpio_read(LED0_PIN));
-    _send_coap_post((uint8_t*)"server", (uint8_t*)led_status);
-    
+    /* Send post notification to server if changed */
+    if (changed) {
+        char led_status[1];
+        sprintf(led_status, "led:%d", 1 - gpio_read(LED0_PIN));
+        _send_coap_post((uint8_t*)"server", (uint8_t*)led_status);
+    }
+
     return result;
 }
