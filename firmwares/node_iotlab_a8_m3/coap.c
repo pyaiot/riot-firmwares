@@ -11,19 +11,16 @@
 #include <coap.h>
 #include "board.h"
 #include "periph_conf.h"
-#include "lsm303dlhc.h"
+#include "periph/gpio.h"
 
 #define MAX_RESPONSE_LEN 500
-#define I2C_INTERFACE I2C_DEV(0)    /* I2C interface number */
-
-static lsm303dlhc_t lsm303dlhc_dev;
-static bool initialized = 0;
 
 static uint8_t response[MAX_RESPONSE_LEN] = { 0 };
 
 static char temperature[15];
 
 extern void _send_coap_post(uint8_t* uri_path, uint8_t *data);
+extern void _read_temperature(int16_t * temperature);
 
 static int handle_get_well_known_core(coap_rw_buffer_t *scratch,
                                       const coap_packet_t *inpkt,
@@ -87,32 +84,6 @@ const coap_endpoint_t endpoints[] =
     /* marks the end of the endpoints array: */
     { (coap_method_t)0, NULL, NULL, NULL }
 };
-
-
-
-void _init_device(void)
-{
-    if (!initialized ) {
-        printf("+------------Initializing device ------------+\n");
-        /* Initialise the I2C serial interface as master */
-        int init = lsm303dlhc_init(&lsm303dlhc_dev, I2C_INTERFACE,
-                                   GPIO_PIN(PORT_B,1),
-                                   GPIO_PIN(PORT_B,2),
-                                   25,
-                                   LSM303DLHC_ACC_SAMPLE_RATE_10HZ,
-                                   LSM303DLHC_ACC_SCALE_2G,
-                                   30,
-                                   LSM303DLHC_MAG_SAMPLE_RATE_75HZ,
-                                   LSM303DLHC_MAG_GAIN_400_355_GAUSS);
-        if (init == -1) {
-            puts("Error: Init: Given device not available\n");
-        }
-        else {
-            printf("Sensor successfuly initialized!");
-            initialized = 1;
-        }
-    }
-}
 
 static int handle_get_well_known_core(coap_rw_buffer_t *scratch,
                                       const coap_packet_t *inpkt,
@@ -201,9 +172,8 @@ static int handle_get_temperature(coap_rw_buffer_t *scratch,
                                   uint8_t id_hi, uint8_t id_lo)
 {
     int16_t temp;
-    _init_device();
     memset(temperature, 0, sizeof(temperature));
-    lsm303dlhc_read_temp(&lsm303dlhc_dev, &temp);
+    _read_temperature(&temp);
     sprintf(temperature, "%.1f°C", (double)temp/128.0);
 
     memcpy(response, temperature,  strlen(temperature));
@@ -252,7 +222,7 @@ static int handle_put_led(coap_rw_buffer_t *scratch,
                                     COAP_CONTENTTYPE_TEXT_PLAIN);
     
     /* Send post notification to server */
-    char led_status[1];
+    char led_status[5];
     sprintf(led_status, "led:%d", gpio_read(LED0_PIN));
     _send_coap_post((uint8_t*)"server", (uint8_t*)led_status);
     

@@ -157,7 +157,7 @@ static int handle_get_led(coap_rw_buffer_t *scratch,
                           uint8_t id_hi, uint8_t id_lo)
 {
     char led_status[1];
-    sprintf(led_status, "%d", 1 - gpio_read(LED0_PIN));
+    sprintf(led_status, "%d", gpio_read(LED0_PIN) == 0);
     memcpy(response, led_status, 1);
     
     return coap_make_response(scratch, outpkt, (const uint8_t *)response, 1,
@@ -177,7 +177,7 @@ static int handle_put_led(coap_rw_buffer_t *scratch,
     if ((inpkt->payload.len == 1) &&
             ((val == 1) || (val == 0))) {
         /* update LED value */
-        gpio_write(LED0_PIN, val - 1);
+        gpio_write(LED0_PIN, 1 - val);
     }
     else {
         resp = COAP_RSPCODE_BAD_REQUEST;
@@ -190,8 +190,8 @@ static int handle_put_led(coap_rw_buffer_t *scratch,
                                     COAP_CONTENTTYPE_TEXT_PLAIN);
     
     /* Send post notification to server */
-    char led_status[1];
-    sprintf(led_status, "led:%d", 1 - gpio_read(LED0_PIN));
+    char led_status[5];
+    sprintf(led_status, "led:%d", gpio_read(LED0_PIN) == 0);
     _send_coap_post((uint8_t*)"server", (uint8_t*)led_status);
     
     return result;

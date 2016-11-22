@@ -107,7 +107,7 @@ void _send_coap_post(uint8_t* uri_path, uint8_t *data)
         return;
     }
     
-    pkt_id = (pkt_id + 1) % 65535;
+    pkt_id++;
     req_hdr.id[0] = (uint8_t)(pkt_id >> 8);
     req_hdr.id[1] = (uint8_t)(pkt_id << 8 / 255);
     

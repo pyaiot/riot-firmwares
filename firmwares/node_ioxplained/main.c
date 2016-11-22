@@ -62,7 +62,7 @@ static coap_header_t req_hdr = {
 
 /* broker  */
 static const char * broker_addr = BROKER_ADDR;
-static uint8_t pkt_id = 0;
+static uint16_t pkt_id = 0;
 static uint8_t response[512] = { 0 };
 
 void microcoap_server_loop(void);
@@ -104,8 +104,9 @@ void _send_coap_post(uint8_t* uri_path, uint8_t *data)
         return;
     }
     
-    pkt_id = (pkt_id + 1) % 65000;
-    req_hdr.id[1] = pkt_id;
+    pkt_id ++;
+    req_hdr.id[0] = (uint8_t)(pkt_id >> 8);
+    req_hdr.id[1] = (uint8_t)(pkt_id << 8 / 255);
     
     uint8_t  snd_buf[128];
     size_t   req_pkt_sz;
@@ -197,7 +198,7 @@ int main(void)
     int sensors_pid = thread_create(sensors_stack, sizeof(sensors_stack),
                                     THREAD_PRIORITY_MAIN - 1,
                                     THREAD_CREATE_STACKTEST, sensors_thread,
-                                    NULL, "IMU thread");
+                                    NULL, "Sensors thread");
     if (sensors_pid == -EINVAL || sensors_pid == -EOVERFLOW) {
         puts("Error: failed to create sensors thread, exiting\n");
     }

@@ -203,7 +203,7 @@ static int handle_put_led(coap_rw_buffer_t *scratch,
                                     COAP_CONTENTTYPE_TEXT_PLAIN);
     
     /* Send post notification to server */
-    char led_status[1];
+    char led_status[5];
     sprintf(led_status, "led:%d", gpio_read(LED0_PIN) == 0);
     _send_coap_post((uint8_t*)"server", (uint8_t*)led_status);
     
