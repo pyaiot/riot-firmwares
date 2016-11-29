@@ -127,15 +127,15 @@ void *sensors_thread(void *args)
     for(;;) {
         lsm303dlhc_read_temp(&lsm303dlhc_dev, &tmp_temperature);
         /* only send temperature update when changed */
-        if (tmp_temperature != s_temperature) {
-            size_t p = 0;
-            p += sprintf((char*)&response[p], "temperature:");
-            p += sprintf((char*)&response[p],
-                         "%.1f°C", (double)tmp_temperature/128.0);
-            response[p] = '\0';
-            _send_coap_post((uint8_t*)"server", response);
-            s_temperature = tmp_temperature;
-        }
+        //if (tmp_temperature != s_temperature) {
+        size_t p = 0;
+        p += sprintf((char*)&response[p], "temperature:");
+        p += sprintf((char*)&response[p],
+                     "%.1f°C", (double)tmp_temperature/128.0);
+        response[p] = '\0';
+        _send_coap_post((uint8_t*)"server", response);
+        s_temperature = tmp_temperature;
+        //}
 
         /* wait 5 seconds */
         xtimer_usleep(SENSORS_INTERVAL);
