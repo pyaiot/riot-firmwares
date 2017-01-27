@@ -23,3 +23,6 @@ parts/
 bin/
 
 *.elf
+
+# QtCreator project files
+RIOT-Fw.*
