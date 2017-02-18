@@ -13,6 +13,8 @@
 #include "periph_conf.h"
 #include "periph/i2c.h"
 
+#define APPLICATION_NAME "I01 XPlained Sensor"
+
 #define MAX_RESPONSE_LEN 500
 #define I2C_INTERFACE I2C_DEV(0)    /* I2C interface number */
 
@@ -28,6 +30,16 @@ static int handle_get_well_known_core(coap_rw_buffer_t *scratch,
                                       const coap_packet_t *inpkt,
                                       coap_packet_t *outpkt,
                                       uint8_t id_hi, uint8_t id_lo);
+
+static int handle_get_name(coap_rw_buffer_t *scratch,
+                           const coap_packet_t *inpkt,
+                           coap_packet_t *outpkt,
+                           uint8_t id_hi, uint8_t id_lo);
+
+static int handle_get_os(coap_rw_buffer_t *scratch,
+                         const coap_packet_t *inpkt,
+                         coap_packet_t *outpkt,
+                         uint8_t id_hi, uint8_t id_lo);
 
 static int handle_get_board(coap_rw_buffer_t *scratch,
                             const coap_packet_t *inpkt,
@@ -47,6 +59,12 @@ static int handle_get_temperature(coap_rw_buffer_t *scratch,
 static const coap_endpoint_path_t path_well_known_core =
         { 2, { ".well-known", "core" } };
 
+static const coap_endpoint_path_t path_name =
+        { 1, { "name" } };
+
+static const coap_endpoint_path_t path_os =
+        { 1, { "os" } };
+
 static const coap_endpoint_path_t path_board =
         { 1, { "board" } };
 
@@ -60,6 +78,10 @@ const coap_endpoint_t endpoints[] =
 {
     { COAP_METHOD_GET,	handle_get_well_known_core,
       &path_well_known_core, "ct=40" },
+    { COAP_METHOD_GET,	handle_get_name,
+      &path_name,	   "ct=0"  },
+    { COAP_METHOD_GET,	handle_get_os,
+      &path_os,  	   "ct=0"  },
     { COAP_METHOD_GET,	handle_get_board,
       &path_board,	   "ct=0"  },
     { COAP_METHOD_GET,	handle_get_mcu,
@@ -140,6 +162,36 @@ static int handle_get_well_known_core(coap_rw_buffer_t *scratch,
                               strlen(rsp), id_hi, id_lo, &inpkt->tok,
                               COAP_RSPCODE_CONTENT,
                               COAP_CONTENTTYPE_APPLICATION_LINKFORMAT);
+}
+
+static int handle_get_name(coap_rw_buffer_t *scratch,
+                           const coap_packet_t *inpkt,
+                           coap_packet_t *outpkt,
+                           uint8_t id_hi, uint8_t id_lo)
+{
+    const char *app_name = APPLICATION_NAME;
+    size_t len = strlen(APPLICATION_NAME);
+
+    memcpy(response, app_name, len);
+
+    return coap_make_response(scratch, outpkt, (const uint8_t *)response, len,
+                              id_hi, id_lo, &inpkt->tok, COAP_RSPCODE_CONTENT,
+                              COAP_CONTENTTYPE_TEXT_PLAIN);
+}
+
+static int handle_get_os(coap_rw_buffer_t *scratch,
+                         const coap_packet_t *inpkt,
+                         coap_packet_t *outpkt,
+                         uint8_t id_hi, uint8_t id_lo)
+{
+    const char *os = "riot";
+    size_t len = strlen("riot");
+
+    memcpy(response, os, len);
+
+    return coap_make_response(scratch, outpkt, (const uint8_t *)response, len,
+                              id_hi, id_lo, &inpkt->tok, COAP_RSPCODE_CONTENT,
+                              COAP_CONTENTTYPE_TEXT_PLAIN);
 }
 
 static int handle_get_board(coap_rw_buffer_t *scratch,
