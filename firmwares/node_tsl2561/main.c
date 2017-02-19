@@ -124,7 +124,7 @@ void *sensors_thread(void *args)
         size_t p = 0;
         p += sprintf((char*)&response[p], "illuminance:");
         p += sprintf((char*)&response[p],
-                     "%i lx", (int)tsl2561_read_illuminance(&tsl2561_dev));
+                     "%ilx", (int)tsl2561_read_illuminance(&tsl2561_dev));
         response[p] = '\0';
         _send_coap_post((uint8_t*)"server", response);
 

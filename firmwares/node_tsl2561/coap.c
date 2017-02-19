@@ -228,7 +228,7 @@ static int handle_get_illuminance(coap_rw_buffer_t *scratch,
     uint16_t ill;
     memset(illuminance, 0, sizeof(illuminance));
     _read_illuminance(&ill);
-    sprintf(illuminance, "%i lx", (int)ill);
+    sprintf(illuminance, "%ilx", (int)ill);
 
     memcpy(response, illuminance,  strlen(illuminance));
 
