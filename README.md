@@ -21,7 +21,7 @@ sensor nodes using the CoAP procotol. The available firmwares are:
   [TSL2561](http://ams.com/eng/Products/Light-Sensors/Ambient-Light-Sensors/TSL2561/TSL2560-TSL2561-Datasheet)
   sensor. The firmware is built for a SAMR21 Xplained Pro board.
 
-The firmwares source code are based on [RIOT](https://github.com/RIOT-OS/RIOT).
+The firmwares source codes are based on [RIOT](https://github.com/RIOT-OS/RIOT).
 
 ### Initializing the repository:
 
