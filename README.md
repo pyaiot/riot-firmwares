@@ -7,7 +7,7 @@ sensor nodes using the CoAP procotol. The available firmwares are:
   The sensor has to be plugged on a SAMR21 Xplained Pro board;
 * [node_leds](./firmwares/node_leds): interact with the on-board LED using CoAP.
   By default, the firmware is built for a SAMR21 Xplained Pro board;
-* [node_leds](./firmwares/node_leds_xbee): same as `node_leds` but by default the
+* [node_leds_xbee](./firmwares/node_leds_xbee): same as `node_leds` but by default the
   firmware is built to run on an Arduino Zero board with an XBee shield;
 * [node_imu](./firmwares/node_imu): read the inertial measurement unit of an
   IoTLAB-M3 board;
