@@ -1,4 +1,4 @@
-### FIT demo firmwares
+### IoT-Kit firmwares
 
 This repository contains simple firmwares for reading or interacting with
 sensor nodes using the CoAP procotol. The available firmwares are:
@@ -21,25 +21,34 @@ sensor nodes using the CoAP procotol. The available firmwares are:
   [TSL2561](http://ams.com/eng/Products/Light-Sensors/Ambient-Light-Sensors/TSL2561/TSL2560-TSL2561-Datasheet)
   sensor. The firmware is built for a SAMR21 Xplained Pro board.
 
-The firmwares source codes are based on [RIOT](https://github.com/RIOT-OS/RIOT).
+All firmwares source codes are based on [RIOT](https://github.com/RIOT-OS/RIOT).
 
-### Initializing the repository:
+#### Initializing the repository:
 
 RIOT is included as a submodule of this repository. We provide a `make` helper
-target to initialize it. From the root of this repository, issue the following
-command:
+target to initialize it.
+From the root of this repository, issue the following command:
 ```
 $ make init_submodules
 ```
 
-### Build the firmwares:
+#### Building the firmwares:
 
 From the root directory of this repository, simply issue the following command:
 ```
 $ make
 ```
 
-### Cleanup the generated firmwares
+#### Flashing the firmwares
+
+For each firmwares use the RIOT way of flashing them. For example, in
+`firmwares/node_bmp180`, use:
+```
+$ make flash
+```
+to flash the firmware on a SAMR21 XPlained Pro board.
+
+#### Global cleanup of the generated firmwares
 
 From the root directory of this repository, issue the following command:
 ```
