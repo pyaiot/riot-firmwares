@@ -5,7 +5,7 @@
 *~
 *.o
 *.DS_Store
-
+*.autosave
 
 # Ruby artifacts
 *.gem
