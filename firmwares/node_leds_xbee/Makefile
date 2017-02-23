@@ -5,7 +5,7 @@ APPLICATION = node_leds_xbee
 BOARD = arduino-zero
 
 # This has to be the absolute path to the RIOT base directory:
-RIOTBASE ?= $(CURDIR)/../..
+RIOTBASE ?= $(CURDIR)/../../RIOT
 
 USEMODULE += xbee
 USEMODULE += gnrc_netdev2
