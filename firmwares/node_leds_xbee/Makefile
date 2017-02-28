@@ -20,7 +20,7 @@ USEPKG += microcoap
 CFLAGS += -DMICROCOAP_DEBUG
 
 XBEE_UART ?= "1"
-CFLAGS += -DXBEE_UART=$(XBEE_UART)
+CFLAGS += -DXBEE_PARAM_UART=$(XBEE_UART)
 
 ## add current directory to the include path. Putting it in CFLAGS will make
 ## it go to the beginning, before the standard includes.
