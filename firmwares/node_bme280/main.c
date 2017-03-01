@@ -142,7 +142,7 @@ void *sensors_thread(void *args)
         p = 0;
         uint16_t hum = bme280_read_humidity(&bme280_dev);
         p += sprintf((char*)&response[p], "humidity:");
-        p += sprintf((char*)&response[p], "%u.%02u",
+        p += sprintf((char*)&response[p], "%u.%02u%%",
                      (unsigned int)(hum / 100),
                      (unsigned int)(hum % 100));
         response[p] = '\0';

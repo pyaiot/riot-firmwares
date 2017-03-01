@@ -288,7 +288,7 @@ static int handle_get_humidity(coap_rw_buffer_t *scratch,
     uint16_t hum;
     memset(humidity, 0, sizeof(humidity));
     _read_humidity(&hum);
-    sprintf(humidity, "%u.%02u",
+    sprintf(humidity, "%u.%02u%%",
             (unsigned int)(hum / 100),
             (unsigned int)(hum % 100));
 
