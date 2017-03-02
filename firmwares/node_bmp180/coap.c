@@ -14,6 +14,8 @@
 #include "periph/gpio.h"
 
 #define APPLICATION_NAME "Weather Sensor"
+#define NODE_POSITION    "{\"lat\":48.714784,\"lng\":2.205502}"
+
 
 #define MAX_RESPONSE_LEN 500
 
@@ -72,6 +74,11 @@ static int handle_put_led(coap_rw_buffer_t *scratch,
                           coap_packet_t *outpkt,
                           uint8_t id_hi, uint8_t id_lo);
 
+static int handle_get_position(coap_rw_buffer_t *scratch,
+                               const coap_packet_t *inpkt,
+                               coap_packet_t *outpkt,
+                               uint8_t id_hi, uint8_t id_lo);
+
 static const coap_endpoint_path_t path_well_known_core =
         { 2, { ".well-known", "core" } };
 
@@ -96,6 +103,10 @@ static const coap_endpoint_path_t path_pressure =
 static const coap_endpoint_path_t path_led =
         { 1, { "led" } };
 
+static const coap_endpoint_path_t path_position =
+        { 1, { "position" } };
+
+
 const coap_endpoint_t endpoints[] =
 {
     { COAP_METHOD_GET,	handle_get_well_known_core,
@@ -116,6 +127,8 @@ const coap_endpoint_t endpoints[] =
       &path_led,	"ct=0"  },
     { COAP_METHOD_PUT,	handle_put_led,
       &path_led,	"ct=0"  },
+    { COAP_METHOD_GET,	handle_get_position,
+      &path_position,	"ct=0"  },
     /* marks the end of the endpoints array: */
     { (coap_method_t)0, NULL, NULL, NULL }
 };
@@ -311,4 +324,19 @@ static int handle_put_led(coap_rw_buffer_t *scratch,
     _send_coap_post((uint8_t*)"server", (uint8_t*)led_status);
 
     return result;
+}
+
+static int handle_get_position(coap_rw_buffer_t *scratch,
+                               const coap_packet_t *inpkt,
+                               coap_packet_t *outpkt,
+                               uint8_t id_hi, uint8_t id_lo)
+{
+    const char *position = NODE_POSITION;
+    size_t len = strlen(NODE_POSITION);
+
+    memcpy(response, position, len);
+    
+    return coap_make_response(scratch, outpkt, (const uint8_t *)response, len,
+                              id_hi, id_lo, &inpkt->tok, COAP_RSPCODE_CONTENT,
+                              COAP_CONTENTTYPE_TEXT_PLAIN);
 }
