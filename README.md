@@ -1,4 +1,4 @@
-### IoT-Kit firmwares
+### RIOT firmwares for Pyaiot
 
 This repository contains simple firmwares for reading or interacting with
 sensor nodes using the CoAP procotol. The available firmwares are:
