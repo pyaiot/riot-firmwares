@@ -52,5 +52,5 @@ to flash the firmware on a SAMR21 XPlained Pro board.
 
 From the root directory of this repository, issue the following command:
 ```
-* make clean
+$ make clean
 ```
