@@ -16,10 +16,11 @@ USEMODULE += gnrc_ipv6_router_default
 USEMODULE += gnrc_udp
 # Additional networking modules that can be dropped if not needed
 USEMODULE += gnrc_icmpv6_echo
-USEMODULE += gnrc_conn_udp
+USEMODULE += gnrc_sock_udp
 
-USEPKG += microcoap
-CFLAGS += -DMICROCOAP_DEBUG
+USEPKG += nanocoap
+USEMODULE += gcoap
+USEMODULE += posix
 
 # include this for printing IP addresses
 USEMODULE += shell_commands
@@ -37,13 +38,10 @@ BROKER_ADDR ?= 2001:660:3207:102::4
 
 CFLAGS += -DBROKER_ADDR=\"$(BROKER_ADDR)\"
 
-# Comment this out to disable code in RIOT that does safety checking
-# which is not needed in a production environment but helps in the
-# development process:
-#CFLAGS += -DDEVELHELP
-
 # Change this to 0 show compiler invocation lines by default:
 QUIET ?= 1
+
+INCLUDES += -I$(CURDIR)/.
 
 include $(RIOTBASE)/Makefile.include
 
