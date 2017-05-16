@@ -3,6 +3,8 @@
 
 #include <inttypes.h>
 
+#include "nanocoap.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif

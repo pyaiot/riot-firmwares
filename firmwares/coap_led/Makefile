@@ -1,3 +1,3 @@
-MODULE = coap_imu
+MODULE = coap_utils
 
 include $(RIOTBASE)/Makefile.base

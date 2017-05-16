@@ -32,7 +32,9 @@ USEMODULE += saul_reg
 USEMODULE += saul_default
 USEMODULE += auto_init_saul
 
+USEMODULE += coap_common
 USEMODULE += coap_utils
+USEMODULE += coap_imu
 
 # CoAP broker server information
 BROKER_ADDR ?= 2001:660:3207:102::4
@@ -42,6 +44,12 @@ CFLAGS += -DBROKER_ADDR=\"$(BROKER_ADDR)\"
 # Change this to 0 show compiler invocation lines by default:
 QUIET ?= 1
 
+# Application specific definitions and includes
+APPLICATION_NAME ?= \"IMU\ Unit\"
+
+DIRS += $(CURDIR)/../coap_common
+INCLUDES += -I$(CURDIR)/../coap_common
+
 DIRS += $(CURDIR)/../coap_utils
 INCLUDES += -I$(CURDIR)/../coap_utils
 
@@ -49,6 +57,8 @@ DIRS += $(CURDIR)/../coap_imu
 INCLUDES += -I$(CURDIR)/../coap_imu
 
 include $(RIOTBASE)/Makefile.include
+
+CFLAGS += -DAPPLICATION_NAME=$(APPLICATION_NAME)
 
 # Set a custom channel if needed
 ifneq (,$(filter cc110x,$(USEMODULE)))          # radio is cc110x sub-GHz

@@ -3,10 +3,10 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "saul_reg.h"
-
 #include "nanocoap.h"
 #include "net/gcoap.h"
+
+#include "saul_reg.h"
 
 static phydat_t data[3];
 static const char *types[] = {"acc", "mag", "gyro"};
