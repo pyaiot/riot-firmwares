@@ -12,10 +12,12 @@
 #include "thread.h"
 #include "msg.h"
 #include "xtimer.h"
-#include "saul_reg.h"
 #include "board.h"
+#include "nanocoap.h"
 #include "net/gcoap.h"
 
+/* RIOT firmware libraries */
+#include "coap_utils.h"
 #include "coap_imu.h"
 
 #ifndef BROKER_ADDR
@@ -23,6 +25,8 @@
 #endif
 
 #define BROKER_PORT 5683
+
+#define APPLICATION_NAME "IMU Unit"
 
 #define INTERVAL              (30000000U)    /* set interval to 30 seconds */
 #define IMU_INTERVAL          (200000U)      /* set imu refresh interval to 200 ms */
@@ -35,10 +39,8 @@ static char beaconing_stack[THREAD_STACKSIZE_DEFAULT];
 static msg_t _imu_msg_queue[IMU_QUEUE_SIZE];
 static char imu_stack[THREAD_STACKSIZE_DEFAULT];
 
-static phydat_t data[3];
-static const char *types[] = {"acc", "mag", "gyro"};
-static char payload[512];
-static uint8_t response[512] = { 0 };
+static uint8_t payload[256] = { 0 };
+static uint8_t response[256] = { 0 };
 
 /* broker  */
 static const char * broker_addr = BROKER_ADDR;
@@ -46,65 +48,65 @@ static const char * broker_addr = BROKER_ADDR;
 /* import "ifconfig" shell command, used for printing addresses */
 extern int _netif_config(int argc, char **argv);
 
+ssize_t name_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len);
+ssize_t board_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len);
+ssize_t mcu_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len);
+ssize_t os_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len);
+
+ssize_t name_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len)
+{
+    gcoap_resp_init(pdu, buf, len, COAP_CODE_CONTENT);
+    const char *app_name = APPLICATION_NAME;
+    size_t payload_len = strlen(APPLICATION_NAME);
+    memcpy(pdu->payload, app_name, payload_len);
+
+    return gcoap_finish(pdu, payload_len, COAP_FORMAT_TEXT);
+}
+
+ssize_t board_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len)
+{
+    gcoap_resp_init(pdu, buf, len, COAP_CODE_CONTENT);
+    const char *board = RIOT_BOARD;
+    size_t payload_len = strlen(RIOT_BOARD);
+    memcpy(pdu->payload, board, payload_len);
+
+    return gcoap_finish(pdu, payload_len, COAP_FORMAT_TEXT);
+}
+
+ssize_t mcu_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len)
+{
+    gcoap_resp_init(pdu, buf, len, COAP_CODE_CONTENT);
+    const char *mcu = RIOT_MCU;
+    size_t payload_len = strlen(RIOT_MCU);
+    memcpy(pdu->payload, mcu, payload_len);
+
+    return gcoap_finish(pdu, payload_len, COAP_FORMAT_TEXT);
+}
+
+ssize_t os_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len)
+{
+    gcoap_resp_init(pdu, buf, len, COAP_CODE_CONTENT);
+    const char *os = "riot";
+    size_t payload_len = strlen("riot");
+    memcpy(pdu->payload, os, payload_len);
+
+    return gcoap_finish(pdu, payload_len, COAP_FORMAT_TEXT);
+}
+
+/* CoAP resources (alphabetical order) */
+static const coap_resource_t _resources[] = {
+    { "/board", COAP_GET, board_handler },
+    { "/imu", COAP_GET, coap_imu_handler },
+    { "/mcu", COAP_GET, mcu_handler },
+    { "/name", COAP_GET, name_handler },
+    { "/os", COAP_GET, os_handler },
+};
+
 static gcoap_listener_t _listener = {
     (coap_resource_t *)&_resources[0],
     sizeof(_resources) / sizeof(_resources[0]),
     NULL
 };
-
-void _read_imu(uint8_t* payload)
-{
-    /* get sensors */
-    saul_reg_t *acc = saul_reg_find_type(SAUL_SENSE_ACCEL);
-    saul_reg_t *mag = saul_reg_find_type(SAUL_SENSE_MAG);
-    saul_reg_t *gyr = saul_reg_find_type(SAUL_SENSE_GYRO);
-    if ((acc == NULL) || (mag == NULL) || (gyr == NULL)) {
-        puts("Unable to find sensors");
-        return;
-    }
-
-    saul_reg_read(acc, &data[0]);
-    saul_reg_read(mag, &data[1]);
-    saul_reg_read(gyr, &data[2]);
-
-    size_t p = 0;
-    p += sprintf((char*)&payload[p], "[");
-    for (int i = 0; i < 3; i++) {
-        p += sprintf((char*)&payload[p],
-                     "{\"type\":\"%s\", \"values\":[%i, %i, %i]},",
-                     types[i], (int)data[i].val[0], (int)data[i].val[1], (int)data[i].val[2]);
-    }
-    p--;
-    p += sprintf((char*)&payload[p], "]");
-    payload[p] = '\0';
-    
-    return;
-}
-
-void _send_coap_post(uint8_t* uri_path, uint8_t *data)
-{
-    /* format destination address from string */
-    ipv6_addr_t remote_addr;
-    sock_udp_ep_t remote;
-    remote.family = AF_INET6;
-    remote.netif  = SOCK_ADDR_ANY_NETIF;
-
-    if (ipv6_addr_from_str(&remote_addr, broker_addr) == NULL) {
-        printf("Error: address not valid '%s'\n", broker_addr);
-        return;
-    }
-    memcpy(&remote.addr.ipv6[0], &remote_addr.u8[0], sizeof(remote_addr.u8));
-    remote.port = BROKER_PORT;
-
-    uint8_t buf[GCOAP_PDU_BUF_SIZE];
-    coap_pkt_t pdu;
-    size_t len;
-
-    gcoap_req_init(&pdu, &buf[0], GCOAP_PDU_BUF_SIZE, COAP_METHOD_POST, (char*)uri_path);
-    memcpy(pdu.payload, data, strlen((char*)data));
-    len = gcoap_finish(&pdu, strlen((char*)data), COAP_FORMAT_TEXT);
-    gcoap_req_send2(buf, len, &remote, NULL);
-}
 
 void *imu_thread(void *args)
 {
@@ -112,11 +114,12 @@ void *imu_thread(void *args)
     
     for(;;) {
         size_t p = 0;
-        _read_imu((uint8_t*)payload);
+        read_imu_values(payload);
         p += sprintf((char*)&response[p], "imu:");
-        p += sprintf((char*)&response[p], payload);
+        p += sprintf((char*)&response[p], (char*)payload);
         response[p] = '\0';
-        _send_coap_post((uint8_t*)"server", response);
+        printf("Sending %s\n",response);
+        send_coap_post(broker_addr, BROKER_PORT, (uint8_t*)"server", response);
         /* wait 3 seconds */
         xtimer_usleep(IMU_INTERVAL);
     }
@@ -129,7 +132,8 @@ void *beaconing_thread(void *args)
     msg_init_queue(_beaconing_msg_queue, BEACONING_QUEUE_SIZE);
     
     for(;;) {
-        _send_coap_post((uint8_t*)"alive", (uint8_t*)"Alive");
+        printf("Sending Alive\n");
+        send_coap_post(broker_addr, BROKER_PORT, (uint8_t*)"alive", (uint8_t*)"Alive");
         /* wait 3 seconds */
         xtimer_usleep(INTERVAL);
     }
@@ -149,8 +153,11 @@ int main(void)
     
     /* print network addresses */
     puts("Configured network interfaces:");
-    _netif_config(0, NULL);
-    
+    _netif_config(0, NULL);;
+
+    /* start coap server loop */
+    gcoap_register_listener(&_listener);
+
     /* create the beaconning thread that will send periodic messages to
        the broker */
     int beacon_pid = thread_create(beaconing_stack, sizeof(beaconing_stack),
@@ -176,14 +183,17 @@ int main(void)
     else {
         puts("Successfuly created imu thread !\n");
     }
-    
+
+#ifdef LED0_TOGGLE
     LED0_TOGGLE;
+#endif
+#ifdef LED0_TOGGLE
     LED1_TOGGLE;
+#endif
+#ifdef LED0_TOGGLE
     LED2_TOGGLE;
-    
-    /* start coap server loop */
-    gcoap_register_listener(&_listener);
-    
+#endif
+
     /* should be never reached */
     return 0;
 }

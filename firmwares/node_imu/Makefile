@@ -13,7 +13,6 @@ USEMODULE += gnrc_netdev_default
 USEMODULE += auto_init_gnrc_netif
 # Specify the mandatory networking modules for IPv6 and UDP
 USEMODULE += gnrc_ipv6_router_default
-USEMODULE += gnrc_udp
 # Additional networking modules that can be dropped if not needed
 USEMODULE += gnrc_icmpv6_echo
 USEMODULE += gnrc_sock_udp
@@ -33,6 +32,8 @@ USEMODULE += saul_reg
 USEMODULE += saul_default
 USEMODULE += auto_init_saul
 
+USEMODULE += coap_utils
+
 # CoAP broker server information
 BROKER_ADDR ?= 2001:660:3207:102::4
 
@@ -41,7 +42,11 @@ CFLAGS += -DBROKER_ADDR=\"$(BROKER_ADDR)\"
 # Change this to 0 show compiler invocation lines by default:
 QUIET ?= 1
 
-INCLUDES += -I$(CURDIR)/.
+DIRS += $(CURDIR)/../coap_utils
+INCLUDES += -I$(CURDIR)/../coap_utils
+
+DIRS += $(CURDIR)/../coap_imu
+INCLUDES += -I$(CURDIR)/../coap_imu
 
 include $(RIOTBASE)/Makefile.include
 
