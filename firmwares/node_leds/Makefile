@@ -13,34 +13,49 @@ USEMODULE += gnrc_netdev_default
 USEMODULE += auto_init_gnrc_netif
 # Specify the mandatory networking modules for IPv6 and UDP
 USEMODULE += gnrc_ipv6_router_default
-USEMODULE += gnrc_udp
 # Additional networking modules that can be dropped if not needed
 USEMODULE += gnrc_icmpv6_echo
-USEMODULE += gnrc_conn_udp
+USEMODULE += gnrc_sock_udp
 
-USEPKG += microcoap
-CFLAGS += -DMICROCOAP_DEBUG
+USEPKG += nanocoap
+USEMODULE += gcoap
+USEMODULE += posix
+
+USEMODULE += xtimer
+USEMODULE += fmt
 
 # include this for printing IP addresses
 USEMODULE += shell_commands
-USEMODULE += xtimer
 
 FEATURES_REQUIRED += periph_gpio
 
-# CoAP broker server information
-BROKER_ADDR ?= 2001:660:3207:102::4
-
-CFLAGS += -DBROKER_ADDR=\"$(BROKER_ADDR)\"
-
-# Comment this out to disable code in RIOT that does safety checking
-# which is not needed in a production environment but helps in the
-# development process:
-#CFLAGS += -DDEVELHELP
+USEMODULE += coap_common
+USEMODULE += coap_utils
+USEMODULE += coap_led
 
 # Change this to 0 show compiler invocation lines by default:
 QUIET ?= 1
 
+# Application specific definitions and includes
+APPLICATION_NAME ?= \"Node\ LED\"
+# CoAP broker server information
+BROKER_ADDR ?= 2001:660:3207:102::4
+BROKER_PORT ?= 5683
+
+DIRS += $(CURDIR)/../coap_common
+INCLUDES += -I$(CURDIR)/../coap_common
+
+DIRS += $(CURDIR)/../coap_utils
+INCLUDES += -I$(CURDIR)/../coap_utils
+
+DIRS += $(CURDIR)/../coap_led
+INCLUDES += -I$(CURDIR)/../coap_led
+
 include $(RIOTBASE)/Makefile.include
+
+CFLAGS += -DBROKER_ADDR=\"$(BROKER_ADDR)\"
+CFLAGS += -DBROKER_PORT=$(BROKER_PORT)
+CFLAGS += -DAPPLICATION_NAME=$(APPLICATION_NAME)
 
 # Set a custom channel if needed
 ifneq (,$(filter cc110x,$(USEMODULE)))          # radio is cc110x sub-GHz

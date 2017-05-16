@@ -18,7 +18,6 @@
 
 /* RIOT firmware libraries */
 #include "coap_common.h"
-#include "coap_utils.h"
 #include "coap_imu.h"
 
 #define MAIN_QUEUE_SIZE       (8)
@@ -45,13 +44,13 @@ static gcoap_listener_t _listener = {
 int main(void)
 {
     puts("RIOT microcoap example application");
-    
+
     /* microcoap_server uses conn which uses gnrc which needs a msg queue */
     msg_init_queue(_main_msg_queue, MAIN_QUEUE_SIZE);
-    
+
     puts("Waiting for address autoconfiguration...");
     xtimer_sleep(3);
-    
+
     /* print network addresses */
     puts("Configured network interfaces:");
     _netif_config(0, NULL);
