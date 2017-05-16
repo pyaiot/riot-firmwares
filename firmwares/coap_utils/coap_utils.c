@@ -5,7 +5,7 @@
 #include "net/gcoap.h"
 #include "coap_utils.h"
 
-void send_coap_post(const char * addr, uint16_t port, uint8_t* uri_path, uint8_t *data)
+void send_coap_post(uint8_t* uri_path, uint8_t *data)
 {
     /* format destination address from string */
     ipv6_addr_t remote_addr;
@@ -13,12 +13,12 @@ void send_coap_post(const char * addr, uint16_t port, uint8_t* uri_path, uint8_t
     remote.family = AF_INET6;
     remote.netif  = SOCK_ADDR_ANY_NETIF;
 
-    if (ipv6_addr_from_str(&remote_addr, addr) == NULL) {
-        printf("Error: address not valid '%s'\n", addr);
+    if (ipv6_addr_from_str(&remote_addr, BROKER_ADDR) == NULL) {
+        printf("Error: address not valid '%s'\n", BROKER_ADDR);
         return;
     }
     memcpy(&remote.addr.ipv6[0], &remote_addr.u8[0], sizeof(remote_addr.u8));
-    remote.port = port;
+    remote.port = BROKER_PORT;
 
     uint8_t buf[GCOAP_PDU_BUF_SIZE];
     coap_pkt_t pdu;

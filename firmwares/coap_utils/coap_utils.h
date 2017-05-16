@@ -8,7 +8,7 @@
 extern "C" {
 #endif
 
-void send_coap_post(const char * addr, uint16_t port, uint8_t* uri_path, uint8_t *data);
+void send_coap_post(uint8_t* uri_path, uint8_t *data);
 
 #ifdef __cplusplus
 }

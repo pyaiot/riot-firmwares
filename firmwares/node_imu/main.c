@@ -28,21 +28,11 @@
 #define BROKER_PORT 5683
 
 #define INTERVAL              (30000000U)    /* set interval to 30 seconds */
-#define IMU_INTERVAL          (200000U)      /* set imu refresh interval to 200 ms */
 #define MAIN_QUEUE_SIZE       (8)
 #define BEACONING_QUEUE_SIZE  (8)
-#define IMU_QUEUE_SIZE  (8)
 static msg_t _main_msg_queue[MAIN_QUEUE_SIZE];
 static msg_t _beaconing_msg_queue[BEACONING_QUEUE_SIZE];
 static char beaconing_stack[THREAD_STACKSIZE_DEFAULT];
-static msg_t _imu_msg_queue[IMU_QUEUE_SIZE];
-static char imu_stack[THREAD_STACKSIZE_DEFAULT];
-
-static uint8_t payload[256] = { 0 };
-static uint8_t response[256] = { 0 };
-
-/* broker  */
-static const char * broker_addr = BROKER_ADDR;
 
 /* import "ifconfig" shell command, used for printing addresses */
 extern int _netif_config(int argc, char **argv);
@@ -62,32 +52,13 @@ static gcoap_listener_t _listener = {
     NULL
 };
 
-void *imu_thread(void *args)
-{
-    msg_init_queue(_imu_msg_queue, IMU_QUEUE_SIZE);
-    
-    for(;;) {
-        size_t p = 0;
-        read_imu_values(payload);
-        p += sprintf((char*)&response[p], "imu:");
-        p += sprintf((char*)&response[p], (char*)payload);
-        response[p] = '\0';
-        printf("Sending %s\n",response);
-        send_coap_post(broker_addr, BROKER_PORT, (uint8_t*)"server", response);
-        /* wait 3 seconds */
-        xtimer_usleep(IMU_INTERVAL);
-    }
-    return NULL;
-}
-
-
 void *beaconing_thread(void *args)
 {
     msg_init_queue(_beaconing_msg_queue, BEACONING_QUEUE_SIZE);
     
     for(;;) {
         printf("Sending Alive\n");
-        send_coap_post(broker_addr, BROKER_PORT, (uint8_t*)"alive", (uint8_t*)"Alive");
+        send_coap_post((uint8_t*)"alive", (uint8_t*)"Alive");
         /* wait 3 seconds */
         xtimer_usleep(INTERVAL);
     }
@@ -107,7 +78,7 @@ int main(void)
     
     /* print network addresses */
     puts("Configured network interfaces:");
-    _netif_config(0, NULL);;
+    _netif_config(0, NULL);
 
     /* start coap server loop */
     gcoap_register_listener(&_listener);
@@ -124,19 +95,8 @@ int main(void)
     else {
         puts("Successfuly created beaconing thread !\n");
     }
-    
-    /* create the sensors thread that will send periodic updates to
-       the server */
-    int imu_pid = thread_create(imu_stack, sizeof(imu_stack),
-                                THREAD_PRIORITY_MAIN - 1,
-                                THREAD_CREATE_STACKTEST, imu_thread,
-                                NULL, "IMU thread");
-    if (imu_pid == -EINVAL || imu_pid == -EOVERFLOW) {
-        puts("Error: failed to create imu thread, exiting\n");
-    }
-    else {
-        puts("Successfuly created imu thread !\n");
-    }
+
+    init_imu_sender();
 
 #ifdef LED0_TOGGLE
     LED0_TOGGLE;

@@ -8,8 +8,20 @@
 
 #include "saul_reg.h"
 
+#include "coap_common.h"
+#include "coap_utils.h"
+
+#define IMU_INTERVAL          (200000U)      /* set imu refresh interval to 200 ms */
+#define IMU_QUEUE_SIZE        (8U)
+
+static msg_t _imu_msg_queue[IMU_QUEUE_SIZE];
+static char imu_stack[THREAD_STACKSIZE_DEFAULT];
+
 static phydat_t data[3];
 static const char *types[] = {"acc", "mag", "gyro"};
+
+static uint8_t payload[128] = { 0 };
+static uint8_t response[128] = { 0 };
 
 void read_imu_values(uint8_t* payload)
 {
@@ -50,4 +62,38 @@ ssize_t coap_imu_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len)
     size_t payload_len = strlen((char*)pdu->payload);
 
     return gcoap_finish(pdu, payload_len, COAP_FORMAT_TEXT);
+}
+
+void *imu_thread(void *args)
+{
+    msg_init_queue(_imu_msg_queue, IMU_QUEUE_SIZE);
+
+    for(;;) {
+        size_t p = 0;
+        read_imu_values(payload);
+        p += sprintf((char*)&response[p], "imu:");
+        p += sprintf((char*)&response[p], (char*)payload);
+        response[p] = '\0';
+        printf("Sending %s\n",response);
+        send_coap_post((uint8_t*)"server", response);
+        /* wait 3 seconds */
+        xtimer_usleep(IMU_INTERVAL);
+    }
+    return NULL;
+}
+
+void init_imu_sender(void)
+{
+    /* create the sensors thread that will send periodic updates to
+       the server */
+    int imu_pid = thread_create(imu_stack, sizeof(imu_stack),
+                                THREAD_PRIORITY_MAIN - 1,
+                                THREAD_CREATE_STACKTEST, imu_thread,
+                                NULL, "IMU thread");
+    if (imu_pid == -EINVAL || imu_pid == -EOVERFLOW) {
+        puts("Error: failed to create imu thread, exiting\n");
+    }
+    else {
+        puts("Successfuly created imu thread !\n");
+    }
 }
