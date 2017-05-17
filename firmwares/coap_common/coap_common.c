@@ -10,6 +10,9 @@
 #include "coap_common.h"
 #include "coap_utils.h"
 
+#define ENABLE_DEBUG (1)
+#include "debug.h"
+
 #define BEACON_INTERVAL       (30000000U)    /* set interval to 30 seconds */
 
 #define BEACONING_QUEUE_SIZE  (8U)
@@ -60,8 +63,7 @@ void *beaconing_thread(void *args)
     msg_init_queue(_beaconing_msg_queue, BEACONING_QUEUE_SIZE);
 
     for(;;) {
-        printf("Sending Alive\n");
-        send_coap_post((uint8_t*)"alive", (uint8_t*)"Alive");
+        send_coap_post((uint8_t*)"/alive", (uint8_t*)"Alive");
         /* wait 3 seconds */
         xtimer_usleep(BEACON_INTERVAL);
     }

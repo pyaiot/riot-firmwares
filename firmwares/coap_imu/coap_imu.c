@@ -75,7 +75,7 @@ void *imu_thread(void *args)
         p += sprintf((char*)&response[p], (char*)payload);
         response[p] = '\0';
         printf("Sending %s\n",response);
-        send_coap_post((uint8_t*)"server", response);
+        send_coap_post((uint8_t*)"/server", response);
         /* wait 3 seconds */
         xtimer_usleep(IMU_INTERVAL);
     }
