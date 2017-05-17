@@ -8,11 +8,7 @@
 
 #include <stdio.h>
 #include "msg.h"
-#include "thread.h"
 #include "xtimer.h"
-
-#include "board.h"
-#include "periph/gpio.h"
 
 #include "nanocoap.h"
 #include "net/gcoap.h"
