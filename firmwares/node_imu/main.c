@@ -9,9 +9,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "thread.h"
-#include "msg.h"
-#include "xtimer.h"
 #include "board.h"
 #include "nanocoap.h"
 #include "net/gcoap.h"
