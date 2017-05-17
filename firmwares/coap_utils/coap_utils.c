@@ -8,13 +8,7 @@
 #define ENABLE_DEBUG (1)
 #include "debug.h"
 
-static void _resp_handler(unsigned req_state, coap_pkt_t* pdu)
-{
-    char *class_str = (coap_get_code_class(pdu) == COAP_CLASS_SUCCESS) ? "Success" : "Error";
-    DEBUG("[INFO] Received '%s', code %1u.%02u\n",
-          class_str, coap_get_code_class(pdu), coap_get_code_detail(pdu));
-    return;
-}
+static sock_udp_t coap_sock;
 
 void send_coap_post(uint8_t* uri_path, uint8_t *data)
 {
@@ -25,6 +19,14 @@ void send_coap_post(uint8_t* uri_path, uint8_t *data)
         return;
     }
 
+    sock_udp_ep_t remote;
+
+    remote.family = AF_INET6;
+    remote.netif  = SOCK_ADDR_ANY_NETIF;
+    remote.port   = BROKER_PORT;
+
+    memcpy(&remote.addr.ipv6[0], &remote_addr.u8[0], sizeof(remote_addr.u8));
+
     uint8_t buf[GCOAP_PDU_BUF_SIZE];
     coap_pkt_t pdu;
     size_t len;
@@ -33,5 +35,6 @@ void send_coap_post(uint8_t* uri_path, uint8_t *data)
     len = gcoap_finish(&pdu, strlen((char*)data) , COAP_FORMAT_TEXT);
 
     DEBUG("[INFO] Sending '%s' to '%s:%i%s'\n", data, BROKER_ADDR, BROKER_PORT, uri_path);
-    gcoap_req_send(buf, len, &remote_addr, BROKER_PORT, _resp_handler);
+
+    sock_udp_send(&coap_sock, buf, len, &remote);
 }

@@ -49,7 +49,6 @@ ssize_t coap_led_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len)
             gpio_write(LED0_PIN, 1 - val);
             code = COAP_CODE_CHANGED;
             p += sprintf(rsp, "led:%i", val);
-
             send_coap_post((uint8_t*)"/server", (uint8_t*)rsp);
         }
         else {
@@ -64,5 +63,5 @@ ssize_t coap_led_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len)
         break;
     }
 
-    return coap_reply_simple(pdu, code, buf, len, COAP_FORMAT_TEXT, (uint8_t*)rsp, p);;
+    return coap_reply_simple(pdu, code, buf, len, COAP_FORMAT_TEXT, (uint8_t*)rsp, p);
 }
