@@ -21,7 +21,7 @@
 #include "debug.h"
 
 #define I2C_INTERFACE              I2C_DEV(0)    /* I2C interface number */
-#define TEMPERATURE_INTERVAL       (5000000U)     /* set temperature updates interval to 5 seconds */
+#define TEMPERATURE_INTERVAL       (5000000U)    /* set temperature updates interval to 5 seconds */
 
 #define IOTLAB_A8_M3_QUEUE_SIZE    (8)
 

@@ -16,27 +16,55 @@ USEMODULE += gnrc_ipv6_router_default
 USEMODULE += gnrc_udp
 # Additional networking modules that can be dropped if not needed
 USEMODULE += gnrc_icmpv6_echo
-USEMODULE += gnrc_conn_udp
+USEMODULE += printf_float
+USEMODULE += gnrc_sock_udp
+USEMODULE += bme280
 
-USEPKG += microcoap
-CFLAGS += -DMICROCOAP_DEBUG
+USEPKG += nanocoap
+USEMODULE += gcoap
+USEMODULE += posix
 
 # include this for printing IP addresses
 USEMODULE += shell_commands
 
-USEMODULE += bme280
-
-FEATURES_REQUIRED += periph_gpio
-
-# CoAP broker server information
-BROKER_ADDR ?= 2001:660:3207:102::4
-
-CFLAGS += -DBROKER_ADDR=\"$(BROKER_ADDR)\"
+USEMODULE += coap_common
+USEMODULE += coap_utils
+USEMODULE += coap_led
+USEMODULE += coap_position
+USEMODULE += coap_bme280
 
 # Change this to 0 show compiler invocation lines by default:
 QUIET ?= 1
 
+# Application specific definitions and includes
+APPLICATION_NAME ?= \"Node\ BME280\"
+NODE_POSITION ?= {"lat":48.714784,"lng":2.205502}
+# CoAP broker server information
+BROKER_ADDR ?= 2001:660:3207:102::4
+BROKER_PORT ?= 5683
+
+DIRS += $(CURDIR)/../coap_common
+INCLUDES += -I$(CURDIR)/../coap_common
+
+DIRS += $(CURDIR)/../coap_utils
+INCLUDES += -I$(CURDIR)/../coap_utils
+
+DIRS += $(CURDIR)/../coap_position
+INCLUDES += -I$(CURDIR)/../coap_position
+
+DIRS += $(CURDIR)/../coap_led
+INCLUDES += -I$(CURDIR)/../coap_led
+
+DIRS += $(CURDIR)/../coap_bme280
+INCLUDES += -I$(CURDIR)/../coap_bme280
+
 include $(RIOTBASE)/Makefile.include
+
+CFLAGS += -DBROKER_ADDR=\"$(BROKER_ADDR)\"
+CFLAGS += -DBROKER_PORT=$(BROKER_PORT)
+CFLAGS += -DAPPLICATION_NAME=$(APPLICATION_NAME)
+CFLAGS += -DNODE_POSITION=\"$(NODE_POSITION)\"
+
 
 # Set a custom channel if needed
 ifneq (,$(filter cc110x,$(USEMODULE)))          # radio is cc110x sub-GHz
