@@ -43,9 +43,9 @@ static gcoap_listener_t _listener = {
 
 int main(void)
 {
-    puts("RIOT microcoap example application");
+    puts("RIOT IoTLAB A8 M3 Node application");
 
-    /* microcoap_server uses conn which uses gnrc which needs a msg queue */
+    /* gnrc which needs a msg queue */
     msg_init_queue(_main_msg_queue, MAIN_QUEUE_SIZE);
 
     puts("Waiting for address autoconfiguration...");

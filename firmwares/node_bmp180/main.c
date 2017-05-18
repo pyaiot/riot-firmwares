@@ -41,7 +41,7 @@ static gcoap_listener_t _listener = {
 
 int main(void)
 {
-    puts("RIOT Node BMP180 application");
+    puts("RIOT BMP180 Node application");
 
     /* microcoap_server uses conn which uses gnrc which needs a msg queue */
     msg_init_queue(_main_msg_queue, MAIN_QUEUE_SIZE);
