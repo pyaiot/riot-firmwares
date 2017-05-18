@@ -43,7 +43,7 @@ int main(void)
 {
     puts("RIOT BMP180 Node application");
 
-    /* microcoap_server uses conn which uses gnrc which needs a msg queue */
+    /* gnrc which needs a msg queue */
     msg_init_queue(_main_msg_queue, MAIN_QUEUE_SIZE);
 
     puts("Waiting for address autoconfiguration...");
