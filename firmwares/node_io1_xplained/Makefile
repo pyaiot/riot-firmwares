@@ -1,5 +1,5 @@
 # name of your application
-APPLICATION = microcoap_server
+APPLICATION = node_io1_xplained
 
 # If no BOARD is found in the environment, use this default:
 BOARD = samr21-xpro
