@@ -1,5 +1,5 @@
 # name of your application
-APPLICATION = node_io1_xplained
+APPLICATION = node_bmp180
 
 # If no BOARD is found in the environment, use this default:
 BOARD = samr21-xpro
@@ -15,7 +15,9 @@ USEMODULE += auto_init_gnrc_netif
 USEMODULE += gnrc_ipv6_router_default
 # Additional networking modules that can be dropped if not needed
 USEMODULE += gnrc_icmpv6_echo
+USEMODULE += printf_float
 USEMODULE += gnrc_sock_udp
+USEMODULE += bmp180
 
 USEPKG += nanocoap
 USEMODULE += gcoap
@@ -23,37 +25,44 @@ USEMODULE += posix
 
 # include this for printing IP addresses
 USEMODULE += shell_commands
-USEMODULE += xtimer
-
-FEATURES_REQUIRED += periph_i2c
 
 USEMODULE += coap_common
 USEMODULE += coap_utils
-USEMODULE += coap_io1_xplained
+USEMODULE += coap_led
+USEMODULE += coap_position
+USEMODULE += coap_bmp180
 
 # Change this to 0 show compiler invocation lines by default:
 QUIET ?= 1
 
 # Application specific definitions and includes
-APPLICATION_NAME ?= \"Node\ IO1\ Xplained\"
+APPLICATION_NAME ?= \"Weather\ Sensor\"
+NODE_POSITION ?= {"lat":48.714784,"lng":2.205502}
 # CoAP broker server information
 BROKER_ADDR ?= 2001:660:3207:102::4
 BROKER_PORT ?= 5683
 
-DIRS += $(CURDIR)/../coap_common
-INCLUDES += -I$(CURDIR)/../coap_common
+DIRS += $(CURDIR)/../../modules/coap_common
+INCLUDES += -I$(CURDIR)/../../modules/coap_common
 
-DIRS += $(CURDIR)/../coap_utils
-INCLUDES += -I$(CURDIR)/../coap_utils
+DIRS += $(CURDIR)/../../modules/coap_utils
+INCLUDES += -I$(CURDIR)/../../modules/coap_utils
 
-DIRS += $(CURDIR)/../coap_io1_xplained
-INCLUDES += -I$(CURDIR)/../coap_io1_xplained
+DIRS += $(CURDIR)/../../modules/coap_position
+INCLUDES += -I$(CURDIR)/../../modules/coap_position
+
+DIRS += $(CURDIR)/../../modules/coap_led
+INCLUDES += -I$(CURDIR)/../../modules/coap_led
+
+DIRS += $(CURDIR)/../../modules/coap_bmp180
+INCLUDES += -I$(CURDIR)/../../modules/coap_bmp180
 
 include $(RIOTBASE)/Makefile.include
 
 CFLAGS += -DBROKER_ADDR=\"$(BROKER_ADDR)\"
 CFLAGS += -DBROKER_PORT=$(BROKER_PORT)
 CFLAGS += -DAPPLICATION_NAME=$(APPLICATION_NAME)
+CFLAGS += -DNODE_POSITION=\"$(NODE_POSITION)\"
 
 # Set a custom channel if needed
 ifneq (,$(filter cc110x,$(USEMODULE)))          # radio is cc110x sub-GHz

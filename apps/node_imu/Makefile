@@ -1,8 +1,8 @@
 # name of your application
-APPLICATION = node_bmp180
+APPLICATION = node_imu
 
 # If no BOARD is found in the environment, use this default:
-BOARD = samr21-xpro
+BOARD = iotlab-m3
 
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../../RIOT
@@ -15,9 +15,7 @@ USEMODULE += auto_init_gnrc_netif
 USEMODULE += gnrc_ipv6_router_default
 # Additional networking modules that can be dropped if not needed
 USEMODULE += gnrc_icmpv6_echo
-USEMODULE += printf_float
 USEMODULE += gnrc_sock_udp
-USEMODULE += bmp180
 
 USEPKG += nanocoap
 USEMODULE += gcoap
@@ -25,44 +23,42 @@ USEMODULE += posix
 
 # include this for printing IP addresses
 USEMODULE += shell_commands
+USEMODULE += xtimer
+
+FEATURES_REQUIRED += periph_gpio
+
+# Add the sensors
+USEMODULE += saul_reg
+USEMODULE += saul_default
+USEMODULE += auto_init_saul
 
 USEMODULE += coap_common
 USEMODULE += coap_utils
-USEMODULE += coap_led
-USEMODULE += coap_position
-USEMODULE += coap_bmp180
+USEMODULE += coap_imu
 
 # Change this to 0 show compiler invocation lines by default:
 QUIET ?= 1
 
 # Application specific definitions and includes
-APPLICATION_NAME ?= \"Weather\ Sensor\"
-NODE_POSITION ?= {"lat":48.714784,"lng":2.205502}
+APPLICATION_NAME ?= \"IMU\ Unit\"
 # CoAP broker server information
 BROKER_ADDR ?= 2001:660:3207:102::4
 BROKER_PORT ?= 5683
 
-DIRS += $(CURDIR)/../coap_common
-INCLUDES += -I$(CURDIR)/../coap_common
+DIRS += $(CURDIR)/../../modules/coap_common
+INCLUDES += -I$(CURDIR)/../../modules/coap_common
 
-DIRS += $(CURDIR)/../coap_utils
-INCLUDES += -I$(CURDIR)/../coap_utils
+DIRS += $(CURDIR)/../../modules/coap_utils
+INCLUDES += -I$(CURDIR)/../../modules/coap_utils
 
-DIRS += $(CURDIR)/../coap_position
-INCLUDES += -I$(CURDIR)/../coap_position
-
-DIRS += $(CURDIR)/../coap_led
-INCLUDES += -I$(CURDIR)/../coap_led
-
-DIRS += $(CURDIR)/../coap_bmp180
-INCLUDES += -I$(CURDIR)/../coap_bmp180
+DIRS += $(CURDIR)/../../modules/coap_imu
+INCLUDES += -I$(CURDIR)/../../modules/coap_imu
 
 include $(RIOTBASE)/Makefile.include
 
 CFLAGS += -DBROKER_ADDR=\"$(BROKER_ADDR)\"
 CFLAGS += -DBROKER_PORT=$(BROKER_PORT)
 CFLAGS += -DAPPLICATION_NAME=$(APPLICATION_NAME)
-CFLAGS += -DNODE_POSITION=\"$(NODE_POSITION)\"
 
 # Set a custom channel if needed
 ifneq (,$(filter cc110x,$(USEMODULE)))          # radio is cc110x sub-GHz

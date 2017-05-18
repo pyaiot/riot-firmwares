@@ -1,8 +1,8 @@
 # name of your application
-APPLICATION = node_empty
+APPLICATION = node_tsl2561
 
 # If no BOARD is found in the environment, use this default:
-BOARD ?= samr21-xpro
+BOARD = samr21-xpro
 
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../../RIOT
@@ -15,7 +15,9 @@ USEMODULE += auto_init_gnrc_netif
 USEMODULE += gnrc_ipv6_router_default
 # Additional networking modules that can be dropped if not needed
 USEMODULE += gnrc_icmpv6_echo
+USEMODULE += printf_float
 USEMODULE += gnrc_sock_udp
+USEMODULE += tsl2561
 
 USEPKG += nanocoap
 USEMODULE += gcoap
@@ -26,26 +28,34 @@ USEMODULE += shell_commands
 
 USEMODULE += coap_common
 USEMODULE += coap_utils
+USEMODULE += coap_led
 USEMODULE += coap_position
+USEMODULE += coap_tsl2561
 
 # Change this to 0 show compiler invocation lines by default:
 QUIET ?= 1
 
 # Application specific definitions and includes
-APPLICATION_NAME ?= \"Node\"
+APPLICATION_NAME ?= \"Light\ Sensor\"
+NODE_POSITION ?= {"lat":48.714784,"lng":2.205502}
 # CoAP broker server information
 BROKER_ADDR ?= 2001:660:3207:102::4
 BROKER_PORT ?= 5683
-NODE_POSITION ?= {"lat":48.714784,"lng":2.205502}
 
-DIRS += $(CURDIR)/../coap_common
-INCLUDES += -I$(CURDIR)/../coap_common
+DIRS += $(CURDIR)/../../modules/coap_common
+INCLUDES += -I$(CURDIR)/../../modules/coap_common
 
-DIRS += $(CURDIR)/../coap_utils
-INCLUDES += -I$(CURDIR)/../coap_utils
+DIRS += $(CURDIR)/../../modules/coap_utils
+INCLUDES += -I$(CURDIR)/../../modules/coap_utils
 
-DIRS += $(CURDIR)/../coap_position
-INCLUDES += -I$(CURDIR)/../coap_position
+DIRS += $(CURDIR)/../../modules/coap_position
+INCLUDES += -I$(CURDIR)/../../modules/coap_position
+
+DIRS += $(CURDIR)/../../modules/coap_led
+INCLUDES += -I$(CURDIR)/../../modules/coap_led
+
+DIRS += $(CURDIR)/../../modules/coap_tsl2561
+INCLUDES += -I$(CURDIR)/../../modules/coap_tsl2561
 
 include $(RIOTBASE)/Makefile.include
 

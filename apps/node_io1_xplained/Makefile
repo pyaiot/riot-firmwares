@@ -1,8 +1,8 @@
 # name of your application
-APPLICATION = node_imu
+APPLICATION = node_io1_xplained
 
 # If no BOARD is found in the environment, use this default:
-BOARD = iotlab-m3
+BOARD = samr21-xpro
 
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../../RIOT
@@ -25,34 +25,29 @@ USEMODULE += posix
 USEMODULE += shell_commands
 USEMODULE += xtimer
 
-FEATURES_REQUIRED += periph_gpio
-
-# Add the sensors
-USEMODULE += saul_reg
-USEMODULE += saul_default
-USEMODULE += auto_init_saul
+FEATURES_REQUIRED += periph_i2c
 
 USEMODULE += coap_common
 USEMODULE += coap_utils
-USEMODULE += coap_imu
+USEMODULE += coap_io1_xplained
 
 # Change this to 0 show compiler invocation lines by default:
 QUIET ?= 1
 
 # Application specific definitions and includes
-APPLICATION_NAME ?= \"IMU\ Unit\"
+APPLICATION_NAME ?= \"Node\ IO1\ Xplained\"
 # CoAP broker server information
 BROKER_ADDR ?= 2001:660:3207:102::4
 BROKER_PORT ?= 5683
 
-DIRS += $(CURDIR)/../coap_common
-INCLUDES += -I$(CURDIR)/../coap_common
+DIRS += $(CURDIR)/../../modules/coap_common
+INCLUDES += -I$(CURDIR)/../../modules/coap_common
 
-DIRS += $(CURDIR)/../coap_utils
-INCLUDES += -I$(CURDIR)/../coap_utils
+DIRS += $(CURDIR)/../../modules/coap_utils
+INCLUDES += -I$(CURDIR)/../../modules/coap_utils
 
-DIRS += $(CURDIR)/../coap_imu
-INCLUDES += -I$(CURDIR)/../coap_imu
+DIRS += $(CURDIR)/../../modules/coap_io1_xplained
+INCLUDES += -I$(CURDIR)/../../modules/coap_io1_xplained
 
 include $(RIOTBASE)/Makefile.include
 

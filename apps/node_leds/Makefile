@@ -42,14 +42,14 @@ APPLICATION_NAME ?= \"Node\ LED\"
 BROKER_ADDR ?= 2001:660:3207:102::4
 BROKER_PORT ?= 5683
 
-DIRS += $(CURDIR)/../coap_common
-INCLUDES += -I$(CURDIR)/../coap_common
+DIRS += $(CURDIR)/../../modules/coap_common
+INCLUDES += -I$(CURDIR)/../../modules/coap_common
 
-DIRS += $(CURDIR)/../coap_utils
-INCLUDES += -I$(CURDIR)/../coap_utils
+DIRS += $(CURDIR)/../../modules/coap_utils
+INCLUDES += -I$(CURDIR)/../../modules/coap_utils
 
-DIRS += $(CURDIR)/../coap_led
-INCLUDES += -I$(CURDIR)/../coap_led
+DIRS += $(CURDIR)/../../modules/coap_led
+INCLUDES += -I$(CURDIR)/../../modules/coap_led
 
 include $(RIOTBASE)/Makefile.include
 
