@@ -54,6 +54,6 @@ int main(void)
     gcoap_register_listener(&_listener);
     init_beacon_sender();
     init_io1_xplained_temperature_sender();
-    /* should be never reached */
+
     return 0;
 }

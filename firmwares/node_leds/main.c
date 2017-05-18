@@ -25,7 +25,7 @@ extern int _netif_config(int argc, char **argv);
 /* CoAP resources (alphabetical order) */
 static const coap_resource_t _resources[] = {
     { "/board", COAP_GET, board_handler },
-    { "/led", COAP_GET | COAP_POST | COAP_PUT, coap_led_handler },
+    { "/led", COAP_GET | COAP_POST | COAP_PUT, led_handler },
     { "/mcu", COAP_GET, mcu_handler },
     { "/name", COAP_GET, name_handler },
     { "/os", COAP_GET, os_handler },

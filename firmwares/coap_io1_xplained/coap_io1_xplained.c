@@ -102,7 +102,7 @@ void init_io1_xplained_temperature_sender(void)
     int io1_xplained_pid = thread_create(io1_xplained_stack, sizeof(io1_xplained_stack),
                                          THREAD_PRIORITY_MAIN - 1,
                                          THREAD_CREATE_STACKTEST, io1_xplained_thread,
-                                         NULL, "Sensors thread");
+                                         NULL, "io1_xplained thread");
     if (io1_xplained_pid == -EINVAL || io1_xplained_pid == -EOVERFLOW) {
         puts("Error: failed to create io1_xplained thread, exiting");
     }

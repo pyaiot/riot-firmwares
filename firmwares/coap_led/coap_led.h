@@ -9,7 +9,7 @@
 extern "C" {
 #endif
 
-ssize_t coap_led_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len);
+ssize_t led_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len);
 
 #ifdef __cplusplus
 }
