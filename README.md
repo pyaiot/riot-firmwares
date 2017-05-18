@@ -1,5 +1,7 @@
 ### RIOT firmwares for Pyaiot
 
+[![Build Status](https://travis-ci.org/pyaiot/riot-firmwares.svg?branch=master)](https://travis-ci.org/pyaiot/riot-firmwares)
+
 This repository contains simple firmwares for reading or interacting with
 sensor nodes using the CoAP procotol. The available firmwares are:
 * [node_bmp180](apps/node_bmp180): read environmental values from a
