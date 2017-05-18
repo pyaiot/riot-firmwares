@@ -20,4 +20,4 @@ void init_bme280_sender(bool temperature, bool pressure, bool humidity);
 }
 #endif
 
-#endif // COAP_BME280_H
+#endif /* COAP_BME280_H */

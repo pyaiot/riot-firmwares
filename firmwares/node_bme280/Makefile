@@ -13,7 +13,6 @@ USEMODULE += gnrc_netdev_default
 USEMODULE += auto_init_gnrc_netif
 # Specify the mandatory networking modules for IPv6 and UDP
 USEMODULE += gnrc_ipv6_router_default
-USEMODULE += gnrc_udp
 # Additional networking modules that can be dropped if not needed
 USEMODULE += gnrc_icmpv6_echo
 USEMODULE += printf_float
@@ -64,7 +63,6 @@ CFLAGS += -DBROKER_ADDR=\"$(BROKER_ADDR)\"
 CFLAGS += -DBROKER_PORT=$(BROKER_PORT)
 CFLAGS += -DAPPLICATION_NAME=$(APPLICATION_NAME)
 CFLAGS += -DNODE_POSITION=\"$(NODE_POSITION)\"
-
 
 # Set a custom channel if needed
 ifneq (,$(filter cc110x,$(USEMODULE)))          # radio is cc110x sub-GHz

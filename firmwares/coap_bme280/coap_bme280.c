@@ -82,32 +82,38 @@ void *bme280_thread(void *args)
     msg_init_queue(_bme280_msg_queue, BME280_QUEUE_SIZE);
 
     for(;;) {
-        ssize_t p = 0;
-        int16_t temp = bme280_read_temperature(&bme280_dev);
-        p += sprintf((char*)&response[p], "temperature:");
-        p += sprintf((char*)&response[p], "%d.%d°C",
-                     temp / 100, (temp % 100) /10);
-        response[p] = '\0';
-        send_coap_post((uint8_t*)"/server", response);
+        if (use_temperature) {
+            ssize_t p = 0;
+            int16_t temp = bme280_read_temperature(&bme280_dev);
+            p += sprintf((char*)&response[p], "temperature:");
+            p += sprintf((char*)&response[p], "%d.%d°C",
+                         temp / 100, (temp % 100) /10);
+            response[p] = '\0';
+            send_coap_post((uint8_t*)"/server", response);
+        }
 
-        p = 0;
-        uint32_t pres = bme280_read_pressure(&bme280_dev);
-        p += sprintf((char*)&response[p], "pressure:");
-        p += sprintf((char*)&response[p], "%lu.%dhPa",
-                     (unsigned long)pres / 100,
-                     (int)pres % 100);
-        response[p] = '\0';
-        send_coap_post((uint8_t*)"/server", response);
+        if (use_pressure) {
+            ssize_t p = 0;
+            uint32_t pres = bme280_read_pressure(&bme280_dev);
+            p += sprintf((char*)&response[p], "pressure:");
+            p += sprintf((char*)&response[p], "%lu.%dhPa",
+                         (unsigned long)pres / 100,
+                         (int)pres % 100);
+            response[p] = '\0';
+            send_coap_post((uint8_t*)"/server", response);
+        }
 
-        p = 0;
-        uint16_t hum = bme280_read_humidity(&bme280_dev);
-        p += sprintf((char*)&response[p], "humidity:");
-        p += sprintf((char*)&response[p], "%u.%02u%%",
-                     (unsigned int)(hum / 100),
-                     (unsigned int)(hum % 100));
-        response[p] = '\0';
-        send_coap_post((uint8_t*)"/server", response);
-        
+        if (use_humidity) {
+            ssize_t p = 0;
+            uint16_t hum = bme280_read_humidity(&bme280_dev);
+            p += sprintf((char*)&response[p], "humidity:");
+            p += sprintf((char*)&response[p], "%u.%02u%%",
+                         (unsigned int)(hum / 100),
+                         (unsigned int)(hum % 100));
+            response[p] = '\0';
+            send_coap_post((uint8_t*)"/server", response);
+        }
+
         /* wait 5 seconds */
         xtimer_usleep(SEND_INTERVAL);
     }
