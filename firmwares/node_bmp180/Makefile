@@ -36,7 +36,7 @@ USEMODULE += coap_bmp180
 QUIET ?= 1
 
 # Application specific definitions and includes
-APPLICATION_NAME ?= \"Node\ BMP180\"
+APPLICATION_NAME ?= \"Weather\ Sensor\"
 NODE_POSITION ?= {"lat":48.714784,"lng":2.205502}
 # CoAP broker server information
 BROKER_ADDR ?= 2001:660:3207:102::4
