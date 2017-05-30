@@ -36,7 +36,7 @@ USEMODULE += coap_iotlab_a8_m3
 QUIET ?= 1
 
 # Application specific definitions and includes
-APPLICATION_NAME ?= \"IoT-Lab\ A8\ Node\"
+APPLICATION_NAME ?= IoT-Lab\ A8\ Node
 NODE_POSITION ?= {"lat":48.714784,"lng":2.205502}
 # CoAP broker server information
 BROKER_ADDR ?= 2001:660:3207:102::4
@@ -61,7 +61,7 @@ include $(RIOTBASE)/Makefile.include
 
 CFLAGS += -DBROKER_ADDR=\"$(BROKER_ADDR)\"
 CFLAGS += -DBROKER_PORT=$(BROKER_PORT)
-CFLAGS += -DAPPLICATION_NAME=$(APPLICATION_NAME)
+CFLAGS += -DAPPLICATION_NAME=\"$(APPLICATION_NAME)\"
 CFLAGS += -DNODE_POSITION=\"$(NODE_POSITION)\"
 
 # Set a custom channel if needed
