@@ -28,7 +28,6 @@ USEMODULE += shell_commands
 
 USEMODULE += coap_common
 USEMODULE += coap_utils
-USEMODULE += coap_led
 USEMODULE += coap_position
 USEMODULE += coap_bmp180
 
@@ -50,9 +49,6 @@ INCLUDES += -I$(CURDIR)/../../modules/coap_utils
 
 DIRS += $(CURDIR)/../../modules/coap_position
 INCLUDES += -I$(CURDIR)/../../modules/coap_position
-
-DIRS += $(CURDIR)/../../modules/coap_led
-INCLUDES += -I$(CURDIR)/../../modules/coap_led
 
 DIRS += $(CURDIR)/../../modules/coap_bmp180
 INCLUDES += -I$(CURDIR)/../../modules/coap_bmp180

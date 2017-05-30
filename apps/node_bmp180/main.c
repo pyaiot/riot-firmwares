@@ -11,7 +11,6 @@
 
 /* RIOT firmware libraries */
 #include "coap_common.h"
-#include "coap_led.h"
 #include "coap_position.h"
 #include "coap_bmp180.h"
 
@@ -24,7 +23,6 @@ extern int _netif_config(int argc, char **argv);
 /* CoAP resources (alphabetical order) */
 static const coap_resource_t _resources[] = {
     { "/board", COAP_GET, board_handler },
-    { "/led", COAP_GET | COAP_PUT | COAP_POST, led_handler },
     { "/mcu", COAP_GET, mcu_handler },
     { "/name", COAP_GET, name_handler },
     { "/os", COAP_GET, os_handler },
