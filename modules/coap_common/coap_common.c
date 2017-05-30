@@ -10,7 +10,7 @@
 #include "coap_common.h"
 #include "coap_utils.h"
 
-#define ENABLE_DEBUG (1)
+#define ENABLE_DEBUG (0)
 #include "debug.h"
 
 #ifndef APPLICATION_NAME
@@ -70,7 +70,7 @@ void *beaconing_thread(void *args)
 
     for(;;) {
         send_coap_post((uint8_t*)"/alive", (uint8_t*)"Alive");
-        /* wait 3 seconds */
+        /* wait 30 seconds */
         xtimer_usleep(BEACON_INTERVAL);
     }
     return NULL;
