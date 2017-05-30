@@ -16,6 +16,8 @@ USEMODULE += gnrc_sock_udp
 USEMODULE += gnrc_ipv6_default
 # Include MQTT-SN
 USEMODULE += emcute
+USEMODULE += mqtt_utils
+USEMODULE += mqtt_common
 
 # include this for printing IP addresses
 USEMODULE += shell_commands
@@ -26,10 +28,16 @@ QUIET ?= 1
 # Application specific definitions and includes
 NODE_ID ?= node_mqtt_led_1
 APPLICATION_NAME ?= Node\ LED\ MQTT
-NODE_POSITION ?= {\"lat\":48.714784,\"lng\":2.205502}
+NODE_POSITION ?= {"lat":48.714784,"lng":2.205502}
 # CoAP broker server information
 GATEWAY_ADDR ?= 2001:660:3207:102::4
 GATEWAY_PORT ?= 1885
+
+DIRS += $(CURDIR)/../../modules/mqtt_common
+INCLUDES += -I$(CURDIR)/../../modules/mqtt_common
+
+DIRS += $(CURDIR)/../../modules/mqtt_utils
+INCLUDES += -I$(CURDIR)/../../modules/mqtt_utils
 
 include $(RIOTBASE)/Makefile.include
 

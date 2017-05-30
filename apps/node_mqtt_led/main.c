@@ -18,6 +18,9 @@
 
 #include "periph/gpio.h"
 
+#include "mqtt_common.h"
+#include "mqtt_utils.h"
+
 #define MQTT_PORT           (1883U)
 #define NUMOFSUBS           (16U)
 #define TOPIC_MAXLEN        (64U)
@@ -51,62 +54,19 @@ typedef struct {
     mqtt_handler_t handler;
 } mqtt_resource_t;
 
-static void get_board(char *value) {
-    sprintf(value, "%s", RIOT_BOARD);
-}
-
-static void get_mcu(char *value) {
-    sprintf(value, "%s", RIOT_MCU);
-}
-
-static void get_os(char *value) {
-    sprintf(value, "riot");
-}
-
-static void get_name(char *value) {
-    sprintf(value, APPLICATION_NAME);
-}
-
-static void get_led(char *value) {
+void get_led(char *value) {
     sprintf(value, "%d", gpio_read(LED0_PIN) == 0);
 }
 
 static const mqtt_resource_t mqtt_resources[] = {
-    {"board", &get_board},
-    {"mcu", &get_mcu},
-    {"os", &get_os},
-    {"name", &get_name},
-    {"led", &get_led},
+    {"board", get_board},
+    {"mcu", get_mcu},
+    {"os", get_os},
+    {"name", get_name},
+    {"led", get_led},
 };
 
 static const unsigned coap_resources_numof = sizeof(mqtt_resources) / sizeof(mqtt_resources[0]);
-
-static int _publish(const char *topic, char *payload)
-{
-    emcute_topic_t t;
-    unsigned flags = EMCUTE_QOS_1;
-
-    printf("publish with topic: %s and name %s and flags 0x%02x\n",
-           topic, payload, (int)flags);
-
-    t.name = topic;
-    if (emcute_reg(&t) != EMCUTE_OK) {
-        puts("error: unable to obtain topic ID");
-        return 1;
-    }
-
-    /* step 2: publish data */
-    if (emcute_pub(&t, payload, strlen(payload), flags) != EMCUTE_OK) {
-        printf("error: unable to publish data to topic '%s [%i]'\n",
-                t.name, (int)t.id);
-        return 1;
-    }
-
-    printf("Published %i bytes to topic '%s [%i]'\n",
-            (int)strlen(payload), t.name, t.id);
-
-    return 0;
-}
 
 static void on_discover_pub(const emcute_topic_t *topic, void *data, size_t len)
 {
@@ -117,14 +77,14 @@ static void on_discover_pub(const emcute_topic_t *topic, void *data, size_t len)
     char payload[64] = {0};
     if (strcmp((char *)data, "resources") == 0) {
         sprintf(payload, "['board', 'mcu', 'os', 'name','led']");
-        if (_publish("node/resources", payload)) {
+        if (publish((uint8_t*)"node/resources", (uint8_t*)payload)) {
             return;
         }
     }
     else {
         for (unsigned i = 0; i < coap_resources_numof; ++i) {
             mqtt_resources[i].handler(payload);
-            if (_publish(mqtt_resources[i].path, payload)) {
+            if (publish((uint8_t*)mqtt_resources[i].path, (uint8_t*)payload)) {
                 continue;
             }
         }
@@ -139,6 +99,13 @@ static void on_led_set_pub(const emcute_topic_t *topic, void *data, size_t len)
            topic->name, (int)topic->id);
     for (size_t i = 0; i < len; i++) {
         printf("%c", in[i]);
+    }
+
+    if (strcmp((char *)data, "1") == 0) {
+        LED0_ON;
+    }
+    else {
+        LED0_OFF;
     }
     puts("");
 }
