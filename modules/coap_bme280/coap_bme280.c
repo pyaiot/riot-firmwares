@@ -37,44 +37,46 @@ static bool use_humidity = false;
 
 ssize_t bme280_temperature_handler(coap_pkt_t *pdu, uint8_t *buf, size_t len)
 {
+    ssize_t p = 0;
     gcoap_resp_init(pdu, buf, len, COAP_CODE_CONTENT);
     memset(response, 0, sizeof(response));
     int16_t temperature = bme280_read_temperature(&bme280_dev);
-    sprintf((char*)response, "%d.%d°C",
-            temperature / 100, (temperature % 100) /10);
-    size_t payload_len = sizeof(response);
-    memcpy(pdu->payload, response, payload_len);
+    p += sprintf((char*)response, "%d.%d°C",
+                 temperature / 100, (temperature % 100) /10);
+    response[p] = '\0';
+    memcpy(pdu->payload, response, p);
 
-    return gcoap_finish(pdu, payload_len, COAP_FORMAT_TEXT);
+    return gcoap_finish(pdu, p, COAP_FORMAT_TEXT);
 }
 
 ssize_t bme280_pressure_handler(coap_pkt_t *pdu, uint8_t *buf, size_t len)
 {
+    ssize_t p = 0;
     gcoap_resp_init(pdu, buf, len, COAP_CODE_CONTENT);
     memset(response, 0, sizeof(response));
     uint32_t pressure = bme280_read_pressure(&bme280_dev);
-    sprintf((char*)response, "%lu.%dhPa",
-            (unsigned long)pressure / 100,
-            (int)pressure % 100);
-    size_t payload_len = sizeof(response);
-    memcpy(pdu->payload, response, payload_len);
+    p += sprintf((char*)response, "%lu.%dhPa",
+                 (unsigned long)pressure / 100,
+                 (int)pressure % 100);
+    response[p] = '\0';
+    memcpy(pdu->payload, response, p);
 
-    return gcoap_finish(pdu, payload_len, COAP_FORMAT_TEXT);
+    return gcoap_finish(pdu, p, COAP_FORMAT_TEXT);
 }
 
 ssize_t bme280_humidity_handler(coap_pkt_t *pdu, uint8_t *buf, size_t len)
 {
+    ssize_t p = 0;
     gcoap_resp_init(pdu, buf, len, COAP_CODE_CONTENT);
     memset(response, 0, sizeof(response));
     uint16_t humidity = bme280_read_humidity(&bme280_dev);
-    sprintf((char*)response, "%u.%02u%%",
+    p += sprintf((char*)response, "%u.%02u%%",
             (unsigned int)(humidity / 100),
             (unsigned int)(humidity % 100));
-    
-    size_t payload_len = sizeof(response);
-    memcpy(pdu->payload, response, payload_len);
+    response[p] = '\0';
+    memcpy(pdu->payload, response, p);
 
-    return gcoap_finish(pdu, payload_len, COAP_FORMAT_TEXT);
+    return gcoap_finish(pdu, p, COAP_FORMAT_TEXT);
 }
 
 void *bme280_thread(void *args)
