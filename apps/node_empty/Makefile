@@ -36,7 +36,8 @@ APPLICATION_NAME ?= Node
 # CoAP broker server information
 BROKER_ADDR ?= 2001:660:3207:102::4
 BROKER_PORT ?= 5683
-NODE_POSITION ?= {"lat":48.714784,"lng":2.205502}
+NODE_LAT ?= 48.714784
+NODE_LNG ?= 2.205502
 
 DIRS += $(CURDIR)/../../modules/coap_common
 INCLUDES += -I$(CURDIR)/../../modules/coap_common
@@ -52,7 +53,8 @@ include $(RIOTBASE)/Makefile.include
 CFLAGS += -DBROKER_ADDR=\"$(BROKER_ADDR)\"
 CFLAGS += -DBROKER_PORT=$(BROKER_PORT)
 CFLAGS += -DAPPLICATION_NAME=\"$(APPLICATION_NAME)\"
-CFLAGS += -DNODE_POSITION=\"$(NODE_POSITION)\"
+CFLAGS += -DNODE_LAT=\"$(NODE_LAT)\"
+CFLAGS += -DNODE_LNG=\"$(NODE_LNG)\"
 
 # Set a custom channel if needed
 ifneq (,$(filter cc110x,$(USEMODULE)))          # radio is cc110x sub-GHz
