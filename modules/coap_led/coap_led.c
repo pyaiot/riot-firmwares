@@ -12,10 +12,9 @@
 #include "net/gcoap.h"
 
 #include "coap_common.h"
-#include "coap_utils.h"
 #include "coap_led.h"
 
-#define ENABLE_DEBUG (1)
+#define ENABLE_DEBUG (0)
 #include "debug.h"
 
 ssize_t led_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len)
@@ -49,7 +48,6 @@ ssize_t led_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len)
             gpio_write(LED0_PIN, 1 - val);
             code = COAP_CODE_CHANGED;
             p += sprintf(rsp, "led:%i", val);
-            send_coap_post((uint8_t*)"/server", (uint8_t*)rsp);
         }
         else {
             DEBUG("[ERROR] Wrong LED value given '%i'\n", val);
