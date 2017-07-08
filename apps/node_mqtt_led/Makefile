@@ -28,9 +28,8 @@ QUIET ?= 1
 # Application specific definitions and includes
 NODE_ID ?= node_mqtt_led_1
 APPLICATION_NAME ?= Node\ LED\ MQTT
-NODE_POSITION ?= {"lat":48.714784,"lng":2.205502}
 # CoAP broker server information
-GATEWAY_ADDR ?= 2001:660:3207:102::4
+GATEWAY_ADDR ?= fd00:abad:1e:102::1
 GATEWAY_PORT ?= 1885
 
 DIRS += $(CURDIR)/../../modules/mqtt_common
@@ -45,7 +44,6 @@ CFLAGS += -DNODE_ID=\"$(NODE_ID)\"
 CFLAGS += -DGATEWAY_ADDR=\"$(GATEWAY_ADDR)\"
 CFLAGS += -DGATEWAY_PORT=$(GATEWAY_PORT)
 CFLAGS += -DAPPLICATION_NAME=\"$(APPLICATION_NAME)\"
-CFLAGS += -DNODE_POSITION=\"$(NODE_POSITION)\"
 
 # Set a custom channel if needed
 ifneq (,$(filter cc110x,$(USEMODULE)))          # radio is cc110x sub-GHz
