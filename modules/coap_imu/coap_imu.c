@@ -8,6 +8,9 @@
 
 #include "saul_reg.h"
 
+#include "debug.h"
+#define ENABLE_DEBUG   (0)
+
 #include "coap_common.h"
 #include "coap_utils.h"
 
@@ -30,7 +33,7 @@ void read_imu_values(uint8_t* payload)
     saul_reg_t *mag = saul_reg_find_type(SAUL_SENSE_MAG);
     saul_reg_t *gyr = saul_reg_find_type(SAUL_SENSE_GYRO);
     if ((acc == NULL) || (mag == NULL) || (gyr == NULL)) {
-        puts("Unable to find sensors");
+        DEBUG("[ERROR] Unable to find sensors\n");
         return;
     }
 
@@ -74,7 +77,6 @@ void *imu_thread(void *args)
         p += sprintf((char*)&response[p], "imu:");
         p += sprintf((char*)&response[p], (char*)payload);
         response[p] = '\0';
-        printf("Sending %s\n",response);
         send_coap_post((uint8_t*)"/server", response);
         /* wait 3 seconds */
         xtimer_usleep(IMU_INTERVAL);

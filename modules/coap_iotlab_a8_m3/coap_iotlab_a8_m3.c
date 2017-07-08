@@ -17,7 +17,7 @@
 #include "coap_utils.h"
 #include "coap_iotlab_a8_m3.h"
 
-#define ENABLE_DEBUG (1)
+#define ENABLE_DEBUG (0)
 #include "debug.h"
 
 #define I2C_INTERFACE              I2C_DEV(0)    /* I2C interface number */

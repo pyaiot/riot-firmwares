@@ -21,8 +21,13 @@ USEPKG += nanocoap
 USEMODULE += gcoap
 USEMODULE += posix
 
-# include this for printing IP addresses
+# include this to get the shell
 USEMODULE += shell_commands
+USEMODULE += shell
+USEMODULE += ps
+USEMODULE += netstats_l2
+USEMODULE += netstats_ipv6
+
 USEMODULE += xtimer
 
 FEATURES_REQUIRED += periph_gpio

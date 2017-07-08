@@ -8,7 +8,7 @@
 
 #include "coap_position.h"
 
-#define ENABLE_DEBUG (1)
+#define ENABLE_DEBUG (0)
 #include "debug.h"
 
 #ifndef NODE_LAT

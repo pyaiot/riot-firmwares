@@ -8,6 +8,7 @@
 
 #include <stdio.h>
 #include "msg.h"
+#include "shell.h"
 
 #include "nanocoap.h"
 #include "net/gcoap.h"
@@ -17,6 +18,10 @@
 #include "coap_led.h"
 #include "coap_position.h"
 #include "coap_iotlab_a8_m3.h"
+
+static const shell_command_t shell_commands[] = {
+    { NULL, NULL, NULL }
+};
 
 #define MAIN_QUEUE_SIZE       (8)
 static msg_t _main_msg_queue[MAIN_QUEUE_SIZE];
@@ -59,6 +64,10 @@ int main(void)
     gcoap_register_listener(&_listener);
     init_beacon_sender();
     init_iotlab_a8_m3_sender();
+
+    puts("All up, running the shell now");
+    char line_buf[SHELL_DEFAULT_BUFSIZE];
+    shell_run(shell_commands, line_buf, SHELL_DEFAULT_BUFSIZE);
 
     return 0;
 }

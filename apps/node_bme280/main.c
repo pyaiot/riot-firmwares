@@ -6,6 +6,8 @@
  * directory for more details.
  */
 
+#include "shell.h"
+
 #include "nanocoap.h"
 #include "net/gcoap.h"
 
@@ -13,6 +15,10 @@
 #include "coap_common.h"
 #include "coap_position.h"
 #include "coap_bme280.h"
+
+static const shell_command_t shell_commands[] = {
+    { NULL, NULL, NULL }
+};
 
 #define MAIN_QUEUE_SIZE       (8)
 static msg_t _main_msg_queue[MAIN_QUEUE_SIZE];
@@ -56,6 +62,10 @@ int main(void)
     gcoap_register_listener(&_listener);
     init_beacon_sender();
     init_bme280_sender(true, true, true);
+
+    puts("All up, running the shell now");
+    char line_buf[SHELL_DEFAULT_BUFSIZE];
+    shell_run(shell_commands, line_buf, SHELL_DEFAULT_BUFSIZE);
 
     return 0;
 }

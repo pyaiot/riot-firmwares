@@ -18,7 +18,7 @@
 #include "coap_utils.h"
 #include "coap_bme280.h"
 
-#define ENABLE_DEBUG (1)
+#define ENABLE_DEBUG (0)
 #include "debug.h"
 
 #define SEND_INTERVAL              (5000000UL)    /* set temperature updates interval to 5 seconds */

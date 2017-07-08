@@ -8,12 +8,17 @@
 
 #include <stdio.h>
 
+#include "shell.h"
 #include "nanocoap.h"
 #include "net/gcoap.h"
 
 /* RIOT firmware libraries */
 #include "coap_common.h"
 #include "coap_io1_xplained.h"
+
+static const shell_command_t shell_commands[] = {
+    { NULL, NULL, NULL }
+};
 
 #define MAIN_QUEUE_SIZE       (8)
 static msg_t _main_msg_queue[MAIN_QUEUE_SIZE];
@@ -54,6 +59,10 @@ int main(void)
     gcoap_register_listener(&_listener);
     init_beacon_sender();
     init_io1_xplained_temperature_sender();
+
+    puts("All up, running the shell now");
+    char line_buf[SHELL_DEFAULT_BUFSIZE];
+    shell_run(shell_commands, line_buf, SHELL_DEFAULT_BUFSIZE);
 
     return 0;
 }

@@ -5,7 +5,7 @@
 #include "net/gcoap.h"
 #include "coap_utils.h"
 
-#define ENABLE_DEBUG (1)
+#define ENABLE_DEBUG (0)
 #include "debug.h"
 
 static sock_udp_t coap_sock;

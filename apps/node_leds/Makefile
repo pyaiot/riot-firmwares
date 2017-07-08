@@ -24,8 +24,12 @@ USEMODULE += posix
 USEMODULE += xtimer
 USEMODULE += fmt
 
-# include this for printing IP addresses
+# include this to get the shell
 USEMODULE += shell_commands
+USEMODULE += shell
+USEMODULE += ps
+USEMODULE += netstats_l2
+USEMODULE += netstats_ipv6
 
 FEATURES_REQUIRED += periph_gpio
 
