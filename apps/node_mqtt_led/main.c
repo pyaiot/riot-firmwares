@@ -11,6 +11,7 @@
 #include <stdlib.h>
 
 #include "xtimer.h"
+#include "shell.h"
 #include "msg.h"
 #include "net/emcute.h"
 #include "net/ipv6/addr.h"
@@ -20,6 +21,9 @@
 
 #include "mqtt_common.h"
 #include "mqtt_utils.h"
+
+#define ENABLE_DEBUG   (1)
+#include "debug.h"
 
 #define MQTT_PORT           (1883U)
 #define NUMOFSUBS           (16U)
@@ -37,7 +41,11 @@
 #define NODE_ID "node_id_0"
 #endif
 
-#define EMCUTE_PRIO         (THREAD_PRIORITY_MAIN - 1)
+static const shell_command_t shell_commands[] = {
+    { NULL, NULL, NULL }
+};
+
+#define EMCUTE_PRIO           (THREAD_PRIORITY_MAIN - 1)
 
 #define MAIN_QUEUE_SIZE       (8)
 static msg_t _main_msg_queue[MAIN_QUEUE_SIZE];
@@ -58,6 +66,8 @@ void get_led(char *value) {
     sprintf(value, "%d", gpio_read(LED0_PIN) == 0);
 }
 
+static char payload[64] = {0};
+
 static const mqtt_resource_t mqtt_resources[] = {
     {"board", get_board},
     {"mcu", get_mcu},
@@ -68,46 +78,64 @@ static const mqtt_resource_t mqtt_resources[] = {
 
 static const unsigned coap_resources_numof = sizeof(mqtt_resources) / sizeof(mqtt_resources[0]);
 
-static void on_discover_pub(const emcute_topic_t *topic, void *data, size_t len)
+static void on_pub(const emcute_topic_t *topic, void *data, size_t len)
 {
-    printf("### got publication for topic '%s' [%i] ###\n",
-           topic->name, (int)topic->id);
-    printf("%s", (char *)data);
+    DEBUG("[DEBUG] ### got publication for topic '%s' [%i] ###\n",
+          topic->name, (int)topic->id);
 
-    char payload[64] = {0};
-    if (strcmp((char *)data, "resources") == 0) {
-        sprintf(payload, "['board', 'mcu', 'os', 'name','led']");
-        if (publish((uint8_t*)"node/resources", (uint8_t*)payload)) {
+    char topic_name[64] = {0};
+    memset(payload, 0, sizeof(payload));
+    if (strcmp(topic->name, "gateway/check") == 0) {
+        DEBUG("[DEBUG] Replying to node/check publication\n");
+        sprintf(payload, "{\"id\": %s}", NODE_ID);
+        if (publish((uint8_t*)"node/check", (uint8_t*)payload)) {
+            DEBUG("[ERROR] Failed to publish on node/check\n");
             return;
         }
     }
-    else {
-        for (unsigned i = 0; i < coap_resources_numof; ++i) {
-            mqtt_resources[i].handler(payload);
-            if (publish((uint8_t*)mqtt_resources[i].path, (uint8_t*)payload)) {
-                continue;
+    else if (strcmp(topic->name, "gateway/1/discover") == 0) {
+        DEBUG("[DEBUG] Replying to node/1/discover publication '%s'\n",
+              (char*)data);
+        if (strcmp((char *)data, "resources") == 0) {
+            // sprintf(payload, "[\"board\", \"mcu\", \"os\", \"name\",\"led\"]");
+            sprintf(payload, "[\"name\"]");
+            memset(topic_name, 0, sizeof(topic_name));
+            sprintf(topic_name, "node/%s/resources", NODE_ID);
+            if (publish((uint8_t*)topic_name, (uint8_t*)payload)) {
+                DEBUG("[ERROR] Failed to publish on node/%s/resources\n",
+                       NODE_ID);
+                return;
+            }
+        }
+        else {
+            for (unsigned i = 0; i < coap_resources_numof; ++i) {
+                mqtt_resources[i].handler(payload);
+                memset(topic_name, 0, sizeof(topic_name));
+                sprintf(topic_name, "node/%s/%s", NODE_ID, mqtt_resources[i].path);
+                if (publish((uint8_t*)topic_name, (uint8_t*)payload)) {
+                    DEBUG("[ERROR] Failed to publish on %s\n", topic_name);
+                    continue;
+                }
             }
         }
     }
-}
+    else if (strcmp(topic->name, "gateway/1/led/set") == 0) {
+        DEBUG("[DEBUG] Replying to node/1/led/set publication '%s'\n",
+              (char*)data);
+        if (strcmp((char *)data, "1") == 0) {
+            LED0_ON;
+        }
+        else {
+            LED0_OFF;
+        }
 
-static void on_led_set_pub(const emcute_topic_t *topic, void *data, size_t len)
-{
-    char *in = (char *)data;
-
-    printf("### got publication for topic '%s' [%i] ###\n",
-           topic->name, (int)topic->id);
-    for (size_t i = 0; i < len; i++) {
-        printf("%c", in[i]);
+        memset(payload, 0, sizeof(payload));
+        sprintf(payload, "{\"value\": %s}", (char*)data);
+        if (publish((uint8_t*)"node/check", (uint8_t*)payload)) {
+            DEBUG("[ERROR] Failed to publish led status");
+            return;
+        }
     }
-
-    if (strcmp((char *)data, "1") == 0) {
-        LED0_ON;
-    }
-    else {
-        LED0_OFF;
-    }
-    puts("");
 }
 
 static int initialize_mqtt_node(void)
@@ -117,38 +145,59 @@ static int initialize_mqtt_node(void)
 
     /* parse address */
     if (ipv6_addr_from_str((ipv6_addr_t *)&gw.addr.ipv6, GATEWAY_ADDR) == NULL) {
-        printf("error parsing IPv6 address\n");
+        DEBUG("[ERROR] error parsing IPv6 address\n");
         return 1;
     }
 
     if (emcute_con(&gw, true, NULL, NULL, 0, 0) != EMCUTE_OK) {
-        printf("error: unable to connect to [%s]:%i\n",
+        DEBUG("[ERROR] unable to connect to [%s]:%i\n",
                GATEWAY_ADDR, (int)GATEWAY_PORT);
+        return 1;
     }
-    printf("Successfully connected to gateway at [%s]:%i\n",
-           GATEWAY_ADDR, (int)GATEWAY_PORT);
-    
+    DEBUG("[INFO] Successfully connected to gateway at [%s]:%i\n",
+          GATEWAY_ADDR, (int)GATEWAY_PORT);
+
     char gw_discover_topic[64] = { 0 };
     sprintf(gw_discover_topic, "gateway/%s/discover", NODE_ID);
-    subscriptions[0].cb = on_discover_pub;
+    subscriptions[0].cb = on_pub;
     strcpy(topics[0], gw_discover_topic);
     subscriptions[0].topic.name = topics[0];
     if (emcute_sub(&subscriptions[0], flags) != EMCUTE_OK) {
-        printf("error: unable to subscribe to %s\n", gw_discover_topic);
+        DEBUG("[ERROR] unable to subscribe to %s\n", gw_discover_topic);
         return 1;
     }
-    printf("Now subscribed to %s\n", gw_discover_topic);
+    DEBUG("[INFO] Now subscribed to %s\n", gw_discover_topic);
+
+    char node_check_topic[64] = { 0 };
+    sprintf(node_check_topic, "gateway/check");
+    subscriptions[1].cb = on_pub;
+    strcpy(topics[1], node_check_topic);
+    subscriptions[1].topic.name = topics[1];
+    if (emcute_sub(&subscriptions[1], flags) != EMCUTE_OK) {
+        DEBUG("[ERROR] unable to subscribe to %s\n", node_check_topic);
+        return 1;
+    }
+    DEBUG("[INFO] Now subscribed to %s\n", node_check_topic);
 
     char led_set_topic[64] = { 0 };
     sprintf(led_set_topic, "gateway/%s/led/set", NODE_ID);
-    subscriptions[0].cb = on_led_set_pub;
-    strcpy(topics[0], led_set_topic);
-    subscriptions[0].topic.name = topics[0];
-    if (emcute_sub(&subscriptions[0], flags) != EMCUTE_OK) {
-        printf("error: unable to subscribe to %s\n", led_set_topic);
+    subscriptions[2].cb = on_pub;
+    strcpy(topics[2], led_set_topic);
+    subscriptions[2].topic.name = topics[2];
+    if (emcute_sub(&subscriptions[2], flags) != EMCUTE_OK) {
+        DEBUG("[ERROR] unable to subscribe to %s\n", led_set_topic);
         return 1;
     }
-    printf("Now subscribed to %s\n", led_set_topic);
+    DEBUG("[INFO] Now subscribed to %s\n", led_set_topic);
+
+    memset(payload, 0, sizeof(payload));
+    sprintf(payload, "{\"id\": %s}", NODE_ID);
+    if (publish((uint8_t*)"node/check", (uint8_t*)payload)) {
+        DEBUG("[ERROR] Failed to publish led status\n");
+        return 1;
+    }
+
+    DEBUG("[INFO] MQTT node initialized with success\n");
 
     return 0;
 }
@@ -182,6 +231,10 @@ int main(void)
                   emcute_thread, NULL, "emcute");
 
     initialize_mqtt_node();
+
+    puts("All up, running the shell now");
+    char line_buf[SHELL_DEFAULT_BUFSIZE];
+    shell_run(shell_commands, line_buf, SHELL_DEFAULT_BUFSIZE);
 
     return 0;
 }

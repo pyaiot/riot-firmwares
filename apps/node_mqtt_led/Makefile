@@ -19,14 +19,18 @@ USEMODULE += emcute
 USEMODULE += mqtt_utils
 USEMODULE += mqtt_common
 
-# include this for printing IP addresses
+# include this to get the shell
 USEMODULE += shell_commands
+USEMODULE += shell
+USEMODULE += ps
+USEMODULE += netstats_l2
+USEMODULE += netstats_ipv6
 
 # Change this to 0 show compiler invocation lines by default:
 QUIET ?= 1
 
 # Application specific definitions and includes
-NODE_ID ?= node_mqtt_led_1
+NODE_ID ?= 1
 APPLICATION_NAME ?= Node\ LED\ MQTT
 # CoAP broker server information
 GATEWAY_ADDR ?= fd00:abad:1e:102::1
