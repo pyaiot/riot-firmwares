@@ -61,7 +61,6 @@ int main(void)
 
     /* start coap server loop */
     gcoap_register_listener(&_listener);
-    init_version_sender();
     init_beacon_sender();
 
     puts("All up, running the shell now");

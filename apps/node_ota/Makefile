@@ -40,30 +40,37 @@ USEMODULE += netstats_ipv6
 
 FEATURES_REQUIRED += periph_gpio
 
-USEMODULE += coap_common
-USEMODULE += coap_utils
-USEMODULE += coap_led
-
 # Change this to 0 show compiler invocation lines by default:
 QUIET ?= 1
+
+# Required modules
+USEMODULE += coap_common
+DIRS += $(CURDIR)/../../modules/coap_common
+INCLUDES += -I$(CURDIR)/../../modules/coap_common
+
+USEMODULE += coap_utils
+DIRS += $(CURDIR)/../../modules/coap_utils
+INCLUDES += -I$(CURDIR)/../../modules/coap_utils
+
+USEMODULE += coap_ota
+DIRS += $(CURDIR)/../../modules/coap_ota
+INCLUDES += -I$(CURDIR)/../../modules/coap_ota
+
+ifneq (1, $(FW_SLOT))
+USEMODULE += coap_led
+DIRS += $(CURDIR)/../../modules/coap_led
+INCLUDES += -I$(CURDIR)/../../modules/coap_led
+else
+USEMODULE += coap_imu
+DIRS += $(CURDIR)/../../modules/coap_imu
+INCLUDES += -I$(CURDIR)/../../modules/coap_imu
+endif
 
 # Application specific definitions and includes
 APPLICATION_NAME ?= Node\ OTA
 # CoAP broker server information
 BROKER_ADDR ?= 2001:660:3207:102::4
 BROKER_PORT ?= 5683
-
-DIRS += $(CURDIR)/../../modules/coap_common
-INCLUDES += -I$(CURDIR)/../../modules/coap_common
-
-DIRS += $(CURDIR)/../../modules/coap_utils
-INCLUDES += -I$(CURDIR)/../../modules/coap_utils
-
-DIRS += $(CURDIR)/../../modules/coap_led
-INCLUDES += -I$(CURDIR)/../../modules/coap_led
-
-DIRS += $(CURDIR)/../../modules/coap_version
-INCLUDES += -I$(CURDIR)/../../modules/coap_version
 
 include $(RIOTBASE)/Makefile.include
 

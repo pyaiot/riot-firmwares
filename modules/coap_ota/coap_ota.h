@@ -1,5 +1,5 @@
-#ifndef COAP_VERSION_H
-#define COAP_VERSION_H
+#ifndef COAP_OTA_H
+#define COAP_OTA_H
 
 #include <stdbool.h>
 #include <inttypes.h>
@@ -19,4 +19,4 @@ void init_version_sender(void);
 }
 #endif
 
-#endif /* COAP_VERSION_H */
+#endif /* COAP_OTA_H */

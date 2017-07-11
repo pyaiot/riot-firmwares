@@ -1,3 +1,3 @@
-MODULE = coap_version
+MODULE = coap_ota
 
 include $(RIOTBASE)/Makefile.base
