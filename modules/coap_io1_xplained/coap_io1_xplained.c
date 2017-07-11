@@ -31,12 +31,13 @@ static uint8_t response[64] = { 0 };
 ssize_t io1_xplained_temperature_handler(coap_pkt_t *pdu, uint8_t *buf, size_t len)
 {
     gcoap_resp_init(pdu, buf, len, COAP_CODE_CONTENT);
-    memset(response, 0, sizeof(response));
     int16_t temperature;
     read_io1_xplained_temperature(&temperature);
-    sprintf((char*)response, "%i°C", temperature);
+    size_t p = 0;
+    p += sprintf((char*)&response[p], "%i°C", temperature);
+    response[p] = '\0';
     
-    size_t payload_len = sizeof(response);
+    size_t payload_len = sizeof(response + 1);
     memcpy(pdu->payload, response, payload_len);
 
     return gcoap_finish(pdu, payload_len, COAP_FORMAT_TEXT);
@@ -74,8 +75,8 @@ void *io1_xplained_thread(void *args)
         int16_t temperature;
         read_io1_xplained_temperature(&temperature);
         size_t p = 0;
-        p += sprintf((char*)&response[p], "temperature:");
-        p += sprintf((char*)&response[p], "%i°C", temperature);
+        p += sprintf((char*)&response[p], "temperature:%i°C",
+                     temperature);
         response[p] = '\0';
         send_coap_post((uint8_t*)"/server", response);
         /* wait 3 seconds */
