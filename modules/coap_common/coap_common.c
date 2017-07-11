@@ -90,4 +90,6 @@ void init_beacon_sender(void)
     else {
         puts("Successfuly created beaconing thread !\n");
     }
+
+    send_coap_post((uint8_t*)"/alive", (uint8_t*)"reset");
 }
