@@ -8,7 +8,7 @@ BOARD ?= iotlab-m3
 RIOTBASE ?= $(CURDIR)/../../RIOT
 
 # OTA definitions
-USEMODULE += ota_update
+USEMODULE += ota_update_tftp
 
 FW_SLOT = 1
 VERSION = 0x1
@@ -56,11 +56,15 @@ USEMODULE += coap_ota
 DIRS += $(CURDIR)/../../modules/coap_ota
 INCLUDES += -I$(CURDIR)/../../modules/coap_ota
 
-ifneq (1, $(FW_SLOT))
+ifeq (1, $(FW_SLOT))
 USEMODULE += coap_led
 DIRS += $(CURDIR)/../../modules/coap_led
 INCLUDES += -I$(CURDIR)/../../modules/coap_led
 else
+# Add the sensors
+USEMODULE += saul_reg
+USEMODULE += saul_default
+USEMODULE += auto_init_saul
 USEMODULE += coap_imu
 DIRS += $(CURDIR)/../../modules/coap_imu
 INCLUDES += -I$(CURDIR)/../../modules/coap_imu
@@ -77,8 +81,8 @@ include $(RIOTBASE)/Makefile.include
 CFLAGS += -DBROKER_ADDR=\"$(BROKER_ADDR)\"
 CFLAGS += -DBROKER_PORT=$(BROKER_PORT)
 CFLAGS += -DAPPLICATION_NAME=\"$(APPLICATION_NAME)\"
-CFLAGS += -DVERSION=$(FIRMWARE_VERSION)
-CFLAGS += -DAPPID=$(FIRMWARE_APPID)
+CFLAGS += -DFIRMWARE_VERSION=\"$(VERSION)\"
+CFLAGS += -DFIRMWARE_APPID=\"$(APPID)\"
 
 # Set a custom channel if needed
 ifneq (,$(filter cc110x,$(USEMODULE)))          # radio is cc110x sub-GHz

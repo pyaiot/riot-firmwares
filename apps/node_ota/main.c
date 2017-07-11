@@ -15,8 +15,13 @@
 #include "net/gcoap.h"
 
 #include "coap_common.h"
+#if defined(MODULE_COAP_IMU)
+#include "coap_imu.h"
+#else
 #include "coap_led.h"
-#include "coap_version.h"
+#endif
+
+#include "coap_ota.h"
 
 static const shell_command_t shell_commands[] = {
     { NULL, NULL, NULL }
@@ -32,7 +37,11 @@ extern int _netif_config(int argc, char **argv);
 static const coap_resource_t _resources[] = {
     { "/appid", COAP_GET, application_id_handler },
     { "/board", COAP_GET, board_handler },
+#if defined(MODULE_COAP_LED)
     { "/led", COAP_GET | COAP_POST | COAP_PUT, led_handler },
+#else
+    { "/imu", COAP_GET, coap_imu_handler },
+#endif
     { "/mcu", COAP_GET, mcu_handler },
     { "/name", COAP_GET, name_handler },
     { "/os", COAP_GET, os_handler },
@@ -62,6 +71,10 @@ int main(void)
     /* start coap server loop */
     gcoap_register_listener(&_listener);
     init_beacon_sender();
+
+#if defined(MODULE_COAP_IMU)
+    init_imu_sender();
+#endif
 
     puts("All up, running the shell now");
     char line_buf[SHELL_DEFAULT_BUFSIZE];
