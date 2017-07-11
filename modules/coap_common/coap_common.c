@@ -78,6 +78,8 @@ void *beaconing_thread(void *args)
 
 void init_beacon_sender(void)
 {
+    send_coap_post((uint8_t*)"/alive", (uint8_t*)"reset");
+
     /* create the beaconning thread that will send periodic messages to
        the broker */
     int beacon_pid = thread_create(beaconing_stack, sizeof(beaconing_stack),
@@ -90,6 +92,4 @@ void init_beacon_sender(void)
     else {
         puts("Successfuly created beaconing thread !\n");
     }
-
-    send_coap_post((uint8_t*)"/alive", (uint8_t*)"reset");
 }
