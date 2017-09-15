@@ -23,13 +23,11 @@
 static msg_t _beaconing_msg_queue[BEACONING_QUEUE_SIZE];
 static char beaconing_stack[THREAD_STACKSIZE_DEFAULT];
 
-char * app_name = APPLICATION_NAME;
-
 ssize_t name_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len)
 {
     gcoap_resp_init(pdu, buf, len, COAP_CODE_CONTENT);
-    size_t payload_len = strlen(app_name);
-    memcpy(pdu->payload, app_name, payload_len);
+    size_t payload_len = strlen(APPLICATION_NAME);
+    memcpy(pdu->payload, APPLICATION_NAME, payload_len);
 
     return gcoap_finish(pdu, payload_len, COAP_FORMAT_TEXT);
 }

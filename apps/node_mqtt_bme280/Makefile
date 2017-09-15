@@ -35,8 +35,8 @@ USEMODULE += bme280
 QUIET ?= 1
 
 # Application specific definitions and includes
-NODE_ID ?= mqtt-2
-APPLICATION_NAME ?= Node\ BME280\ MQTT-SN
+NODE_ID ?= "mqtt-2"
+APPLICATION_NAME ?= "Node\ BME280\ MQTT-SN"
 # CoAP broker server information
 GATEWAY_ADDR ?= fd00:abad:1e:102::1
 GATEWAY_PORT ?= 1885
@@ -52,10 +52,10 @@ INCLUDES += -I$(CURDIR)/../../modules/mqtt_utils
 
 include $(RIOTBASE)/Makefile.include
 
-CFLAGS += -DNODE_ID=\"$(NODE_ID)\"
+CFLAGS += -DNODE_ID="\"$(NODE_ID)\""
 CFLAGS += -DGATEWAY_ADDR=\"$(GATEWAY_ADDR)\"
 CFLAGS += -DGATEWAY_PORT=$(GATEWAY_PORT)
-CFLAGS += -DAPPLICATION_NAME=\"$(APPLICATION_NAME)\"
+CFLAGS += -DAPPLICATION_NAME="\"$(APPLICATION_NAME)\""
 
 # Set a custom channel if needed
 ifneq (,$(filter cc110x,$(USEMODULE)))          # radio is cc110x sub-GHz

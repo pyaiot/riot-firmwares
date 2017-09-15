@@ -23,10 +23,6 @@
 static msg_t _beaconing_msg_queue[BEACONING_QUEUE_SIZE];
 static char beaconing_stack[THREAD_STACKSIZE_DEFAULT];
 
-const char *app_name = APPLICATION_NAME;
-
-const char *node_id = NODE_ID;
-
 void get_board(char *value) {
     DEBUG("[DEBUG] Get board '%s'\n", RIOT_BOARD);
     sprintf(value, "{\"value\":\"%s\"}", RIOT_BOARD);
@@ -43,8 +39,8 @@ void get_os(char *value) {
 }
 
 void get_name(char *value) {
-    DEBUG("[DEBUG] Get application name '%s'\n", app_name);
-    sprintf(value, "{\"value\":\"%s\"}", app_name);
+    DEBUG("[DEBUG] Get application name '%s'\n", APPLICATION_NAME);
+    sprintf(value, "{\"value\":\"%s\"}", APPLICATION_NAME);
 }
 
 void *beaconing_thread(void *args)
@@ -53,7 +49,7 @@ void *beaconing_thread(void *args)
     msg_init_queue(_beaconing_msg_queue, BEACONING_QUEUE_SIZE);
     for(;;) {
         memset(id, 0, sizeof(id));
-        sprintf(id, "{\"id\":\"%s\"}", node_id);
+        sprintf(id, "{\"id\":\"%s\"}", NODE_ID);
         publish((uint8_t*)"node/check", (uint8_t*)id);
         /* wait 30 seconds */
         xtimer_usleep(BEACON_INTERVAL);

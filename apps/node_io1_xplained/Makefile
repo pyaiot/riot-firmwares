@@ -40,7 +40,7 @@ USEMODULE += coap_io1_xplained
 QUIET ?= 1
 
 # Application specific definitions and includes
-APPLICATION_NAME ?= Node\ IO1\ Xplained
+APPLICATION_NAME ?= "Node\ IO1\ Xplained"
 # CoAP broker server information
 BROKER_ADDR ?= 2001:660:3207:102::4
 BROKER_PORT ?= 5683
@@ -58,7 +58,7 @@ include $(RIOTBASE)/Makefile.include
 
 CFLAGS += -DBROKER_ADDR=\"$(BROKER_ADDR)\"
 CFLAGS += -DBROKER_PORT=$(BROKER_PORT)
-CFLAGS += -DAPPLICATION_NAME=\"$(APPLICATION_NAME)\"
+CFLAGS += -DAPPLICATION_NAME="\"$(APPLICATION_NAME)\""
 
 # Set a custom channel if needed
 ifneq (,$(filter cc110x,$(USEMODULE)))          # radio is cc110x sub-GHz

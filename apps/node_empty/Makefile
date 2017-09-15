@@ -36,7 +36,7 @@ USEMODULE += coap_position
 QUIET ?= 1
 
 # Application specific definitions and includes
-APPLICATION_NAME ?= Node
+APPLICATION_NAME ?= "Node"
 # CoAP broker server information
 BROKER_ADDR ?= 2001:660:3207:102::4
 BROKER_PORT ?= 5683
@@ -56,7 +56,7 @@ include $(RIOTBASE)/Makefile.include
 
 CFLAGS += -DBROKER_ADDR=\"$(BROKER_ADDR)\"
 CFLAGS += -DBROKER_PORT=$(BROKER_PORT)
-CFLAGS += -DAPPLICATION_NAME=\"$(APPLICATION_NAME)\"
+CFLAGS += -DAPPLICATION_NAME="\"$(APPLICATION_NAME)\""
 CFLAGS += -DNODE_LAT=\"$(NODE_LAT)\"
 CFLAGS += -DNODE_LNG=\"$(NODE_LNG)\"
 
