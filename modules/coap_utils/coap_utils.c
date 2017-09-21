@@ -22,7 +22,7 @@ static void _resp_handler(unsigned req_state, coap_pkt_t* pdu,
 {
     /* TODO  Nothing? (Copy paste from gcoap example as they are data )*/
 
-#if ENABLE_DEBUG == 1 || 1
+#if ENABLE_DEBUG == 1
     (void)remote;       /* not interested in the source currently */
 
     if (req_state == GCOAP_MEMO_TIMEOUT) {
@@ -90,6 +90,6 @@ void send_coap_post(uint8_t* uri_path, uint8_t *data)
 
     DEBUG("[INFO] Sending '%s' to '%s:%i%s'\n", data, BROKER_ADDR, BROKER_PORT, uri_path);
 
-    gcoap_req_send2(&buf[0], len, &remote, _resp_handler);
+    gcoap_req_send2(&buf[0], len, &remote, (gcoap_resp_handler_t ) _resp_handler);
 
 }
