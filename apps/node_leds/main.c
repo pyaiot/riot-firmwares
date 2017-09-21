@@ -11,7 +11,6 @@
 #include "xtimer.h"
 #include "shell.h"
 
-#include "nanocoap.h"
 #include "net/gcoap.h"
 
 #include "coap_common.h"
