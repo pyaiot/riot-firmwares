@@ -12,7 +12,6 @@
 #include "tsl2561_params.h"
 #include "tsl2561.h"
 
-#include "nanocoap.h"
 #include "net/gcoap.h"
 
 #include "coap_utils.h"

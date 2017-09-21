@@ -7,7 +7,6 @@
 #include "xtimer.h"
 #include "periph/i2c.h"
 
-#include "nanocoap.h"
 #include "net/gcoap.h"
 
 #include "coap_utils.h"
@@ -36,7 +35,7 @@ ssize_t io1_xplained_temperature_handler(coap_pkt_t *pdu, uint8_t *buf, size_t l
     size_t p = 0;
     p += sprintf((char*)&response[p], "%i°C", temperature);
     response[p] = '\0';
-    
+
     size_t payload_len = sizeof(response + 1);
     memcpy(pdu->payload, response, payload_len);
 
@@ -52,7 +51,7 @@ void read_io1_xplained_temperature(int16_t *temperature)
                SENSOR_ADDR, I2C_INTERFACE);
         return;
     }
-    
+
     uint16_t data = (buffer[0] << 8) | buffer[1];
     int8_t sign = 1;
     /* Check if negative and clear sign bit. */
@@ -70,7 +69,7 @@ void read_io1_xplained_temperature(int16_t *temperature)
 void *io1_xplained_thread(void *args)
 {
     msg_init_queue(_io1_xplained_msg_queue, IO1_XPLAINED_QUEUE_SIZE);
-    
+
     for(;;) {
         int16_t temperature;
         read_io1_xplained_temperature(&temperature);

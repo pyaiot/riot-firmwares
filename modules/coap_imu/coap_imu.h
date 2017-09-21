@@ -3,7 +3,7 @@
 
 #include <inttypes.h>
 
-#include "nanocoap.h"
+#include "net/gcoap.h"
 
 #ifdef __cplusplus
 extern "C" {

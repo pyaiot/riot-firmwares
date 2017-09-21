@@ -8,7 +8,6 @@
 #include "xtimer.h"
 #include "periph/i2c.h"
 
-#include "nanocoap.h"
 #include "net/gcoap.h"
 
 #include "periph/gpio.h"
@@ -39,7 +38,7 @@ ssize_t lsm303dlhc_temperature_handler(coap_pkt_t *pdu, uint8_t *buf, size_t len
     int16_t temperature = 0;
     lsm303dlhc_read_temp(&lsm303dlhc_dev, &temperature);
     sprintf((char*)response, "%i°C", temperature);
-    
+
     size_t payload_len = sizeof(response);
     memcpy(pdu->payload, response, payload_len);
 
