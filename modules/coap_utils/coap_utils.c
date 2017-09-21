@@ -19,6 +19,7 @@ void send_coap_post(uint8_t* uri_path, uint8_t *data)
         return;
     }
 
+    DEBUG("[DEBUG] utils: sending to '%s'\n", BROKER_ADDR);
     sock_udp_ep_t remote;
 
     remote.family = AF_INET6;
