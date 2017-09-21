@@ -3,7 +3,6 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "nanocoap.h"
 #include "net/gcoap.h"
 
 #include "saul_reg.h"

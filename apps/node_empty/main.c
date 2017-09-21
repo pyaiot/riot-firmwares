@@ -12,7 +12,6 @@
 #include "msg.h"
 #include "xtimer.h"
 
-#include "nanocoap.h"
 #include "net/gcoap.h"
 
 #include "coap_common.h"

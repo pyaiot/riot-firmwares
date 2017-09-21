@@ -19,9 +19,10 @@ USEMODULE += printf_float
 USEMODULE += gnrc_sock_udp
 USEMODULE += lsm303dlhc
 
-USEPKG += nanocoap
 USEMODULE += gcoap
-USEMODULE += posix
+# NOTE: Temporary, just for debug msgs
+USEMODULE += od
+USEMODULE += fmt
 
 # include this to get the shell
 USEMODULE += shell_commands

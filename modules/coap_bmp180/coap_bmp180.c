@@ -12,7 +12,6 @@
 #include "bmp180_params.h"
 #include "bmp180.h"
 
-#include "nanocoap.h"
 #include "net/gcoap.h"
 
 #include "coap_utils.h"

@@ -11,7 +11,6 @@
 
 #include "board.h"
 #include "shell.h"
-#include "nanocoap.h"
 #include "net/gcoap.h"
 
 /* RIOT firmware libraries */

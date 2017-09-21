@@ -12,7 +12,6 @@
 #include "bme280_params.h"
 #include "bme280.h"
 
-#include "nanocoap.h"
 #include "net/gcoap.h"
 
 #include "coap_utils.h"

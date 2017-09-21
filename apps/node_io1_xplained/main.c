@@ -9,7 +9,6 @@
 #include <stdio.h>
 
 #include "shell.h"
-#include "nanocoap.h"
 #include "net/gcoap.h"
 
 /* RIOT firmware libraries */
@@ -44,13 +43,13 @@ static gcoap_listener_t _listener = {
 int main(void)
 {
     puts("RIOT IO1 XPlained Pro Node application");
-    
+
     /* gnrc which needs a msg queue */
     msg_init_queue(_main_msg_queue, MAIN_QUEUE_SIZE);
-    
+
     puts("Waiting for address autoconfiguration...");
     xtimer_sleep(3);
-    
+
     /* print network addresses */
     puts("Configured network interfaces:");
     _netif_config(0, NULL);
