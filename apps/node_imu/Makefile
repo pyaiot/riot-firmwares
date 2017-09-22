@@ -17,9 +17,7 @@ USEMODULE += gnrc_ipv6_router_default
 USEMODULE += gnrc_icmpv6_echo
 USEMODULE += gnrc_sock_udp
 
-USEPKG += nanocoap
 USEMODULE += gcoap
-USEMODULE += posix
 
 # include this to get the shell
 USEMODULE += shell_commands

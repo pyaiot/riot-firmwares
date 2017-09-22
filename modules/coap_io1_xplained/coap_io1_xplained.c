@@ -7,7 +7,6 @@
 #include "xtimer.h"
 #include "periph/i2c.h"
 
-#include "nanocoap.h"
 #include "net/gcoap.h"
 
 #include "coap_utils.h"

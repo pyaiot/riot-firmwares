@@ -19,9 +19,7 @@ USEMODULE += printf_float
 USEMODULE += gnrc_sock_udp
 USEMODULE += tsl2561
 
-USEPKG += nanocoap
 USEMODULE += gcoap
-USEMODULE += posix
 
 # include this to get the shell
 USEMODULE += shell_commands

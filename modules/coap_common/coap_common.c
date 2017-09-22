@@ -4,7 +4,6 @@
 #include <string.h>
 
 #include "thread.h"
-#include "nanocoap.h"
 #include "net/gcoap.h"
 
 #include "coap_common.h"
