@@ -39,8 +39,7 @@ ssize_t bmp180_temperature_handler(coap_pkt_t *pdu, uint8_t *buf, size_t len)
 {
     gcoap_resp_init(pdu, buf, len, COAP_CODE_CONTENT);
     memset(response, 0, sizeof(response));
-    int32_t temperature = 0;
-    bmp180_read_temperature(&bmp180_dev, &temperature);
+    int32_t temperature = bmp180_read_temperature(&bmp180_dev);
     sprintf((char*)response, "%.1f°C", (double)temperature / 10.0);
     size_t payload_len = sizeof(response);
     memcpy(pdu->payload, response, payload_len);
@@ -52,8 +51,7 @@ ssize_t bmp180_pressure_handler(coap_pkt_t *pdu, uint8_t *buf, size_t len)
 {
     gcoap_resp_init(pdu, buf, len, COAP_CODE_CONTENT);
     memset(response, 0, sizeof(response));
-    int32_t pressure = 0;
-    bmp180_read_pressure(&bmp180_dev, &pressure);
+    int32_t pressure = bmp180_read_pressure(&bmp180_dev);
     sprintf((char*)response, "%.2fhPa", (double)pressure / 100);
     size_t payload_len = sizeof(response);
     memcpy(pdu->payload, response, payload_len);
@@ -68,8 +66,7 @@ void *bmp180_thread(void *args)
     for(;;) {
         if (use_temperature) {
             ssize_t p = 0;
-            int32_t temperature = 0;
-            bmp180_read_temperature(&bmp180_dev, &temperature);
+            int32_t temperature = bmp180_read_temperature(&bmp180_dev);
             p += sprintf((char*)&response[p], "temperature:");
             p += sprintf((char*)&response[p], "%.1f°C", (double)temperature / 10);
             response[p] = '\0';
@@ -78,8 +75,7 @@ void *bmp180_thread(void *args)
 
         if (use_pressure) {
             ssize_t p = 0;
-            int32_t pressure = 0;
-            bmp180_read_pressure(&bmp180_dev, &pressure);
+            int32_t pressure = bmp180_read_pressure(&bmp180_dev);
             p += sprintf((char*)&response[p], "pressure:");
             p += sprintf((char*)&response[p], "%.2fhPa", (double)pressure / 100);
             response[p] = '\0';
@@ -100,7 +96,7 @@ void init_bmp180_sender(bool temperature, bool pressure)
 
     /* Initialize the BMP180 sensor */
     printf("+------------Initializing BMP180 sensor ------------+\n");
-    int result = bmp180_init(&bmp180_dev, I2C_DEVICE, BMP180_ULTRALOWPOWER);
+    int result = bmp180_init(&bmp180_dev, &bmp180_params[0]);
     if (result == -1) {
         puts("[Error] The given i2c is not enabled");
     }
