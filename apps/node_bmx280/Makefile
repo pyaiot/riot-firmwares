@@ -1,5 +1,5 @@
 # name of your application
-APPLICATION = node_bme280
+APPLICATION = node_bmx280
 
 # If no BOARD is found in the environment, use this default:
 BOARD = samr21-xpro
