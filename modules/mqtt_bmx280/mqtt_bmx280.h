@@ -1,5 +1,5 @@
-#ifndef MQTT_BME280_H
-#define MQTT_BME280_H
+#ifndef MQTT_BMX280_H
+#define MQTT_BMX280_H
 
 #include <stdbool.h>
 #include <inttypes.h>
@@ -10,12 +10,14 @@ extern "C" {
 
 void get_temperature(char *value);
 void get_pressure(char *value);
+#ifdef MODULE_BME280
 void get_humidity(char *value);
+#endif
 
-void init_bme280_mqtt_sender(void);
+void init_bmx280_mqtt_sender(void);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif
+#endif /* MQTT_BMX280_H */

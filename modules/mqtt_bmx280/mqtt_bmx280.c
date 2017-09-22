@@ -8,11 +8,11 @@
 #include "xtimer.h"
 #include "periph/i2c.h"
 
-#include "mqtt_bme280.h"
+#include "mqtt_bmx280.h"
 #include "mqtt_utils.h"
 
-#include "bme280.h"
-#include "bme280_params.h"
+#include "bmx280.h"
+#include "bmx280_params.h"
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"
@@ -27,11 +27,11 @@
 static msg_t _publish_msg_queue[PUBLISH_QUEUE_SIZE];
 static char publish_stack[THREAD_STACKSIZE_DEFAULT];
 
-static bme280_t bme280_dev;
+static bmx280_t bmx280_dev;
 
 void get_temperature(char *value) {
     ssize_t p = 0;
-    int16_t temp = bme280_read_temperature(&bme280_dev);
+    int16_t temp = bmx280_read_temperature(&bmx280_dev);
     p += sprintf(value, "{\"value\":\"%d.%d°C\"}",
                  temp / 100, (temp % 100) /10);
     value[p] = '\0';
@@ -40,7 +40,7 @@ void get_temperature(char *value) {
 
 void get_pressure(char *value) {
     ssize_t p = 0;
-    uint32_t pres = bme280_read_pressure(&bme280_dev);
+    uint32_t pres = bmx280_read_pressure(&bmx280_dev);
     p += sprintf(value, "{\"value\":\"%lu.%dhPa\"}",
                  (unsigned long)pres / 100,
                  (int)pres % 100);
@@ -48,15 +48,17 @@ void get_pressure(char *value) {
     DEBUG("[DEBUG] Get pressure '%s'\n", value);
 }
 
+#ifdef MODULE_BME280
 void get_humidity(char *value) {
     ssize_t p = 0;
-    uint16_t hum = bme280_read_humidity(&bme280_dev);
+    uint16_t hum = bme280_read_humidity(&bmx280_dev);
     p += sprintf(value, "{\"value\":\"%u.%02u%%\"}",
                  (unsigned int)(hum / 100),
                  (unsigned int)(hum % 100));
     value[p] = '\0';
     DEBUG("[DEBUG] Get humidity '%s'\n", value);
 }
+#endif
 
 void *publish_thread(void *args)
 {
@@ -76,22 +78,24 @@ void *publish_thread(void *args)
         get_pressure(payload);
         publish((uint8_t*)topic, (uint8_t*)payload);
 
+#ifdef MODULE_BME280
         xtimer_sleep(1);
         memset(topic, 0, sizeof(topic));
         sprintf(topic, "node/%s/humidity", NODE_ID);
         get_humidity(payload);
         publish((uint8_t*)topic, (uint8_t*)payload);
+#endif
         /* wait 5 seconds */
         xtimer_sleep(PUBLISH_INTERVAL);
     }
     return NULL;
 }
 
-void init_bme280_mqtt_sender(void)
+void init_bmx280_mqtt_sender(void)
 {
-    /* Initialize the BME280 sensor */
-    DEBUG("+------------Initializing BME280 sensor ------------+\n");
-    int result = bme280_init(&bme280_dev, &bme280_params[0]);
+    /* Initialize the BMX280 sensor */
+    DEBUG("+------------Initializing BMX280 sensor ------------+\n");
+    int result = bmx280_init(&bmx280_dev, &bmx280_params[0]);
     if (result == -1) {
         DEBUG("[ERROR] The given i2c is not enabled\n");
     }
@@ -109,7 +113,7 @@ void init_bme280_mqtt_sender(void)
                                    THREAD_CREATE_STACKTEST, publish_thread,
                                    NULL, "Publish thread");
     if (publish_pid == -EINVAL || publish_pid == -EOVERFLOW) {
-        DEBUG("[ERROR] Failed to create bme280 sender thread, exiting\n");
+        DEBUG("[ERROR] Failed to create bmx280 sender thread, exiting\n");
     }
     else {
         DEBUG("[ERROR] Successfuly created beaconing thread !\n");

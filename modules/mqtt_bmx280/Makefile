@@ -1,3 +1,3 @@
-MODULE = mqtt_bme280
+MODULE = mqtt_bmx280
 
 include $(RIOTBASE)/Makefile.base

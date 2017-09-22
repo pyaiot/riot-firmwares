@@ -20,7 +20,7 @@
 #include "periph/gpio.h"
 
 #include "mqtt_common.h"
-#include "mqtt_bme280.h"
+#include "mqtt_bmx280.h"
 #include "mqtt_utils.h"
 
 #define ENABLE_DEBUG   (0)
@@ -64,7 +64,9 @@ static char payload[64] = {0};
 
 static const mqtt_resource_t mqtt_resources[] = {
     {"board", get_board},
+#ifdef MODULE_BME280
     {"humidity", get_humidity},
+#endif
     {"mcu", get_mcu},
     {"os", get_os},
     {"name", get_name},
@@ -87,7 +89,7 @@ static int initialize_mqtt_node(void)
 
     if (emcute_con(&gw, true, NULL, NULL, 0, 0) != EMCUTE_OK) {
         DEBUG("[ERROR] unable to connect to [%s]:%i\n",
-               GATEWAY_ADDR, (int)GATEWAY_PORT);
+              GATEWAY_ADDR, (int)GATEWAY_PORT);
         return -1;
     }
     DEBUG("[INFO] Successfully connected to gateway at [%s]:%i\n",
@@ -102,9 +104,15 @@ static int initialize_mqtt_node(void)
 
     xtimer_sleep(1);
 
+#ifdef MODULE_BME280
     sprintf(payload,
             "[\"board\",\"mcu\",\"os\",\"name\","
             "\"temperature\",\"pressure\",\"humidity\"]");
+#else
+    sprintf(payload,
+            "[\"board\",\"mcu\",\"os\",\"name\","
+            "\"temperature\",\"pressure\"]");
+#endif
     memset(topic, 0, sizeof(topic));
     sprintf(topic, "node/%s/resources", NODE_ID);
     if (publish((uint8_t*)topic, (uint8_t*)payload)) {
@@ -162,7 +170,7 @@ int main(void)
         puts("Failed to initialize MQTT node");
     }
 
-    init_bme280_mqtt_sender();
+    init_bmx280_mqtt_sender();
     init_beacon_sender();
 
     puts("All up, running the shell now");

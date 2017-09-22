@@ -1,8 +1,10 @@
 # name of your application
-APPLICATION = node_mqtt_bme280
+APPLICATION = node_mqtt_bmx280
 
 # If no BOARD is found in the environment, use this default:
 BOARD ?= samr21-xpro
+
+DRIVER ?= bme280
 
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../../RIOT
@@ -28,8 +30,8 @@ USEMODULE += netstats_ipv6
 
 USEMODULE += mqtt_utils
 USEMODULE += mqtt_common
-USEMODULE += mqtt_bme280
-USEMODULE += bme280
+USEMODULE += mqtt_bmx280
+USEMODULE += $(DRIVER)
 
 # Change this to 0 show compiler invocation lines by default:
 QUIET ?= 1
@@ -44,8 +46,8 @@ GATEWAY_PORT ?= 1885
 DIRS += $(CURDIR)/../../modules/mqtt_common
 INCLUDES += -I$(CURDIR)/../../modules/mqtt_common
 
-DIRS += $(CURDIR)/../../modules/mqtt_bme280
-INCLUDES += -I$(CURDIR)/../../modules/mqtt_bme280
+DIRS += $(CURDIR)/../../modules/mqtt_bmx280
+INCLUDES += -I$(CURDIR)/../../modules/mqtt_bmx280
 
 DIRS += $(CURDIR)/../../modules/mqtt_utils
 INCLUDES += -I$(CURDIR)/../../modules/mqtt_utils
