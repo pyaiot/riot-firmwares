@@ -1,3 +1,3 @@
-MODULE = coap_bme280
+MODULE = coap_bmx280
 
 include $(RIOTBASE)/Makefile.base

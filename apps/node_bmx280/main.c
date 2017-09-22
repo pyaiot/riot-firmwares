@@ -14,7 +14,7 @@
 /* RIOT firmware libraries */
 #include "coap_common.h"
 #include "coap_position.h"
-#include "coap_bme280.h"
+#include "coap_bmx280.h"
 
 static const shell_command_t shell_commands[] = {
     { NULL, NULL, NULL }
@@ -29,13 +29,15 @@ extern int _netif_config(int argc, char **argv);
 /* CoAP resources (alphabetical order) */
 static const coap_resource_t _resources[] = {
     { "/board", COAP_GET, board_handler },
-    { "/humidity", COAP_GET, bme280_humidity_handler },
+#ifdef MODULE_BME280
+    { "/humidity", COAP_GET, bmx280_humidity_handler },
+#endif
     { "/mcu", COAP_GET, mcu_handler },
     { "/name", COAP_GET, name_handler },
     { "/os", COAP_GET, os_handler },
     { "/position", COAP_GET, position_handler },
-    { "/pressure", COAP_GET, bme280_pressure_handler },
-    { "/temperature", COAP_GET, bme280_temperature_handler },
+    { "/pressure", COAP_GET, bmx280_pressure_handler },
+    { "/temperature", COAP_GET, bmx280_temperature_handler },
 };
 
 static gcoap_listener_t _listener = {
@@ -46,7 +48,7 @@ static gcoap_listener_t _listener = {
 
 int main(void)
 {
-    puts("RIOT BME280 Node application");
+    puts("RIOT BMX280 Node application");
 
     /* gnrc which needs a msg queue */
     msg_init_queue(_main_msg_queue, MAIN_QUEUE_SIZE);
@@ -61,7 +63,7 @@ int main(void)
     /* start coap server loop */
     gcoap_register_listener(&_listener);
     init_beacon_sender();
-    init_bme280_sender(true, true, true);
+    init_bmx280_sender(true, true, true);
 
     puts("All up, running the shell now");
     char line_buf[SHELL_DEFAULT_BUFSIZE];

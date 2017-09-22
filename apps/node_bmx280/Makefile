@@ -4,6 +4,8 @@ APPLICATION = node_bme280
 # If no BOARD is found in the environment, use this default:
 BOARD = samr21-xpro
 
+DRIVER ?= bme280
+
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../../RIOT
 
@@ -17,11 +19,9 @@ USEMODULE += gnrc_ipv6_router_default
 USEMODULE += gnrc_icmpv6_echo
 USEMODULE += printf_float
 USEMODULE += gnrc_sock_udp
-USEMODULE += bme280
+USEMODULE += $(DRIVER)
 
-USEPKG += nanocoap
 USEMODULE += gcoap
-USEMODULE += posix
 
 # include this to get the shell
 USEMODULE += shell_commands
@@ -33,7 +33,7 @@ USEMODULE += netstats_ipv6
 USEMODULE += coap_common
 USEMODULE += coap_utils
 USEMODULE += coap_position
-USEMODULE += coap_bme280
+USEMODULE += coap_bmx280
 
 # Change this to 0 show compiler invocation lines by default:
 QUIET ?= 1
@@ -53,8 +53,8 @@ INCLUDES += -I$(CURDIR)/../../modules/coap_utils
 DIRS += $(CURDIR)/../../modules/coap_position
 INCLUDES += -I$(CURDIR)/../../modules/coap_position
 
-DIRS += $(CURDIR)/../../modules/coap_bme280
-INCLUDES += -I$(CURDIR)/../../modules/coap_bme280
+DIRS += $(CURDIR)/../../modules/coap_bmx280
+INCLUDES += -I$(CURDIR)/../../modules/coap_bmx280
 
 include $(RIOTBASE)/Makefile.include
 
