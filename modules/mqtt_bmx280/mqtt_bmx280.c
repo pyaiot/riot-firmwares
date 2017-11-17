@@ -32,8 +32,13 @@ static bmx280_t bmx280_dev;
 void get_temperature(char *value) {
     ssize_t p = 0;
     int16_t temp = bmx280_read_temperature(&bmx280_dev);
-    p += sprintf(value, "{\"value\":\"%d.%d°C\"}",
-                 temp / 100, (temp % 100) /10);
+    bool negative = temp < 0;
+    if (negative) {
+        temp = -temp;
+    }
+    p += sprintf(value, "{\"value\":\"%s%d.%d°C\"}",
+                 negative ? "-" : "",
+                 temp / 100, (temp % 100) / 10);
     value[p] = '\0';
     DEBUG("[DEBUG] Get temperature '%s'\n", value);
 }
