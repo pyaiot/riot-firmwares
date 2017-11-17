@@ -43,8 +43,13 @@ ssize_t bmx280_temperature_handler(coap_pkt_t *pdu, uint8_t *buf, size_t len)
     gcoap_resp_init(pdu, buf, len, COAP_CODE_CONTENT);
     memset(response, 0, sizeof(response));
     int16_t temperature = bmx280_read_temperature(&bmx280_dev);
-    p += sprintf((char*)response, "%d.%d°C",
-                 temperature / 100, (temperature % 100) /10);
+    bool negative = (temperature < 0);
+    if (negative) {
+        temperature = -temperature;
+    }
+    p += sprintf((char*)response, "%s%d.%d°C",
+                 (negative) ? "-" : "",
+                 temperature / 100, (temperature % 100) / 10);
     response[p] = '\0';
     memcpy(pdu->payload, response, p);
 
@@ -91,8 +96,13 @@ void *bmx280_thread(void *args)
         if (use_temperature) {
             ssize_t p = 0;
             int16_t temp = bmx280_read_temperature(&bmx280_dev);
+            bool negative = (temp < 0);
+            if (negative) {
+                temp = -temp;
+            }
             p += sprintf((char*)&response[p], "temperature:");
-            p += sprintf((char*)&response[p], "%d.%d°C",
+            p += sprintf((char*)&response[p], "%s%d.%d°C",
+                         negative ? "-" : "",
                          temp / 100, (temp % 100) /10);
             response[p] = '\0';
             send_coap_post((uint8_t*)"/server", response);
