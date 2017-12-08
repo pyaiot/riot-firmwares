@@ -19,48 +19,28 @@
 static msg_t _imu_msg_queue[IMU_QUEUE_SIZE];
 static char imu_stack[THREAD_STACKSIZE_DEFAULT];
 
-static phydat_t data[3];
-static const char *types[] = {"acc", "mag", "gyro"};
-
-static uint8_t payload[128] = { 0 };
+static phydat_t data[2];
 static uint8_t response[128] = { 0 };
 
-void read_imu_values(uint8_t* payload)
+void read_imu_values(void)
 {
     /* get sensors */
     saul_reg_t *acc = saul_reg_find_type(SAUL_SENSE_ACCEL);
-    saul_reg_t *mag = saul_reg_find_type(SAUL_SENSE_MAG);
     saul_reg_t *gyr = saul_reg_find_type(SAUL_SENSE_GYRO);
-    if ((acc == NULL) || (mag == NULL) || (gyr == NULL)) {
+    if ((acc == NULL) || (gyr == NULL)) {
         DEBUG("[ERROR] Unable to find sensors\n");
         return;
     }
 
     saul_reg_read(acc, &data[0]);
-    saul_reg_read(mag, &data[1]);
-    saul_reg_read(gyr, &data[2]);
-
-    size_t p = 0;
-    p += sprintf((char*)&payload[p], "[");
-    for (unsigned i = 0; i < 3; ++i) {
-        if (i == 1) {
-            /* Skip magnetometer */
-            continue;
-        }
-        p += sprintf((char*)&payload[p],
-                     "{\"type\":\"%s\",\"values\":[%i, %i, %i]},",
-                     types[i], (int)data[i].val[0], (int)data[i].val[1], (int)data[i].val[2]);
-    }
-    p--;
-    p += sprintf((char*)&payload[p], "]");
-    payload[p] = '\0';
+    saul_reg_read(gyr, &data[1]);
     return;
 }
 
 ssize_t coap_imu_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len)
 {
     gcoap_resp_init(pdu, buf, len, COAP_CODE_CONTENT);
-    read_imu_values(pdu->payload);
+    read_imu_values();
     size_t payload_len = strlen((char*)pdu->payload);
 
     return gcoap_finish(pdu, payload_len, COAP_FORMAT_TEXT);
@@ -72,9 +52,21 @@ void *imu_thread(void *args)
 
     for(;;) {
         size_t p = 0;
-        read_imu_values(payload);
+        memset(response, strlen((char*)response), 0);
+        read_imu_values();
         p += sprintf((char*)&response[p], "imu:");
-        p += sprintf((char*)&response[p], (char*)payload);
+        p += sprintf((char*)&response[p],
+                 "[{\"type\":\"acc\",\"values\":[%i,%i,%i]}]",
+                 data[0].val[0], data[0].val[1], data[0].val[2]);
+        response[p] = '\0';
+        send_coap_post((uint8_t*)"/server", response);
+
+        p = 0;
+        memset(response, strlen((char*)response), 0);
+        p += sprintf((char*)&response[p], "imu:");
+        p += sprintf((char*)&response[p],
+                 "[{\"type\":\"gyro\",\"values\":[%i,%i,%i]}]",
+                 data[1].val[0], data[1].val[1], data[1].val[2]);
         response[p] = '\0';
         send_coap_post((uint8_t*)"/server", response);
         /* wait 3 seconds */
