@@ -20,7 +20,7 @@ static msg_t _imu_msg_queue[IMU_QUEUE_SIZE];
 static char imu_stack[THREAD_STACKSIZE_DEFAULT];
 
 static phydat_t data[2];
-static uint8_t response[128] = { 0 };
+static uint8_t response[128];
 
 void read_imu_values(void)
 {
@@ -41,7 +41,15 @@ ssize_t coap_imu_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len)
 {
     gcoap_resp_init(pdu, buf, len, COAP_CODE_CONTENT);
     read_imu_values();
-    size_t payload_len = strlen((char*)pdu->payload);
+    memset(response, 0, sizeof(response));
+    size_t p = 0;
+    p += sprintf((char*)&response[p], "imu:");
+    p += sprintf((char*)&response[p],
+                 "[{\"type\":\"acc\",\"values\":[%i,%i,%i]}]",
+                 data[0].val[0], data[0].val[1], data[0].val[2]);
+    response[p] = '\0';
+    size_t payload_len = strlen((char*)response);
+    memcpy(pdu->payload, response, payload_len);
 
     return gcoap_finish(pdu, payload_len, COAP_FORMAT_TEXT);
 }
