@@ -146,7 +146,7 @@ static void *emcute_thread(void *arg)
 }
 
 /* import "ifconfig" shell command, used for printing addresses */
-extern int _netif_config(int argc, char **argv);
+extern int _gnrc_netif_config(int argc, char **argv);
 
 int main(void)
 {
@@ -160,7 +160,7 @@ int main(void)
 
     /* print network addresses */
     puts("Configured network interfaces:");
-    _netif_config(0, NULL);
+    _gnrc_netif_config(0, NULL);
 
     /* start the emcute thread */
     thread_create(stack, sizeof(stack), EMCUTE_PRIO, 0,

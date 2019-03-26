@@ -10,7 +10,10 @@
 
 #include "net/gcoap.h"
 
+#include "board.h"
+
 #include "periph/gpio.h"
+#include "lsm303dlhc_params.h"
 #include "lsm303dlhc.h"
 
 #include "coap_utils.h"
@@ -31,8 +34,9 @@ static lsm303dlhc_t lsm303dlhc_dev;
 static uint8_t response[64] = { 0 };
 
 
-ssize_t lsm303dlhc_temperature_handler(coap_pkt_t *pdu, uint8_t *buf, size_t len)
+ssize_t lsm303dlhc_temperature_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len, void *ctx)
 {
+    (void)ctx;
     gcoap_resp_init(pdu, buf, len, COAP_CODE_CONTENT);
     memset(response, 0, sizeof(response));
     int16_t temperature = 0;
@@ -47,6 +51,7 @@ ssize_t lsm303dlhc_temperature_handler(coap_pkt_t *pdu, uint8_t *buf, size_t len
 
 void *iotlab_a8_m3_thread(void *args)
 {
+    (void)args;
     msg_init_queue(_iotlab_a8_m3_msg_queue, IOTLAB_A8_M3_QUEUE_SIZE);
     int16_t temperature;
 
@@ -70,15 +75,7 @@ void init_iotlab_a8_m3_sender(void)
 {
     printf("+------------Initializing temperature device ------------+\n");
     /* Initialise the I2C serial interface as master */
-    int init = lsm303dlhc_init(&lsm303dlhc_dev, I2C_INTERFACE,
-                               GPIO_PIN(PORT_B,1),
-                               GPIO_PIN(PORT_B,2),
-                               25,
-                               LSM303DLHC_ACC_SAMPLE_RATE_10HZ,
-                               LSM303DLHC_ACC_SCALE_2G,
-                               30,
-                               LSM303DLHC_MAG_SAMPLE_RATE_75HZ,
-                               LSM303DLHC_MAG_GAIN_400_355_GAUSS);
+    int init = lsm303dlhc_init(&lsm303dlhc_dev, &lsm303dlhc_params[0]);
     if (init == -1) {
         puts("Error: Init: Given device not available\n");
     }

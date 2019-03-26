@@ -19,8 +19,9 @@
 
 static uint8_t response[64] = { 0 };
 
-ssize_t position_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len)
+ssize_t position_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len, void *ctx)
 {
+    (void)ctx;
     ssize_t p = 0;
     gcoap_resp_init(pdu, buf, len, COAP_CODE_CONTENT);
     p += sprintf((char*)response, "{\"lat\":%s,\"lng\":%s}",

@@ -37,8 +37,9 @@ void read_imu_values(void)
     return;
 }
 
-ssize_t coap_imu_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len)
+ssize_t coap_imu_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len, void *ctx)
 {
+    (void)ctx;
     gcoap_resp_init(pdu, buf, len, COAP_CODE_CONTENT);
     read_imu_values();
     memset(response, 0, sizeof(response));
@@ -56,6 +57,8 @@ ssize_t coap_imu_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len)
 
 void *imu_thread(void *args)
 {
+        (void)args;
+
     msg_init_queue(_imu_msg_queue, IMU_QUEUE_SIZE);
 
     for(;;) {
