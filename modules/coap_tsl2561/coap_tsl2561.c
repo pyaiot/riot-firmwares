@@ -14,6 +14,8 @@
 
 #include "net/gcoap.h"
 
+#include "board.h"
+
 #include "coap_utils.h"
 #include "coap_tsl2561.h"
 
@@ -33,8 +35,9 @@ static char tsl2561_stack[THREAD_STACKSIZE_DEFAULT];
 static tsl2561_t tsl2561_dev;
 static uint8_t response[64] = { 0 };
 
-ssize_t tsl2561_illuminance_handler(coap_pkt_t *pdu, uint8_t *buf, size_t len)
+ssize_t tsl2561_illuminance_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len, void *ctx)
 {
+    (void)ctx;
     gcoap_resp_init(pdu, buf, len, COAP_CODE_CONTENT);
     memset(response, 0, sizeof(response));
     sprintf((char*)response, "%ilx", (int)tsl2561_read_illuminance(&tsl2561_dev));
@@ -46,6 +49,7 @@ ssize_t tsl2561_illuminance_handler(coap_pkt_t *pdu, uint8_t *buf, size_t len)
 
 void *tsl2561_thread(void *args)
 {
+    (void)args;
     msg_init_queue(_tsl2561_msg_queue, TSL2561_QUEUE_SIZE);
 
     for(;;) {
@@ -67,9 +71,7 @@ void init_tsl2561_sender(void)
 {
     /* Initialize the TSL2561 sensor */
     printf("+------------Initializing TSL2561 sensor ------------+\n");
-    uint8_t result = tsl2561_init(&tsl2561_dev, I2C_DEVICE,
-                                  TSL2561_ADDR_FLOAT, TSL2561_GAIN_1X,
-                                  TSL2561_INTEGRATIONTIME_402MS);
+    int result = tsl2561_init(&tsl2561_dev, &tsl2561_params[0]);
     if (result == -1) {
         puts("[Error] The given i2c is not enabled");
     }

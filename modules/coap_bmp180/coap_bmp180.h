@@ -10,8 +10,8 @@
 extern "C" {
 #endif
 
-ssize_t bmp180_temperature_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len);
-ssize_t bmp180_pressure_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len);
+ssize_t bmp180_temperature_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len, void *ctx);
+ssize_t bmp180_pressure_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len, void *ctx);
 
 void init_bmp180_sender(bool temperature, bool pressure);
 

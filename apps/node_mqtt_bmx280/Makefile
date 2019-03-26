@@ -19,7 +19,6 @@ USEMODULE += gnrc_icmpv6_echo
 USEMODULE += gnrc_ipv6_router_default
 # Include MQTT-SN
 USEMODULE += emcute
-USEMODULE += posix
 
 # include this to get the shell
 USEMODULE += shell_commands

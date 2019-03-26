@@ -9,7 +9,7 @@
 extern "C" {
 #endif
 
-ssize_t lsm303dlhc_temperature_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len);
+ssize_t lsm303dlhc_temperature_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len, void *ctx);
 
 void init_iotlab_a8_m3_sender(void);
 

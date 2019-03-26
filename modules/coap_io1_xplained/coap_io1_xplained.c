@@ -27,8 +27,9 @@ static char io1_xplained_stack[THREAD_STACKSIZE_DEFAULT];
 
 static char response[64];
 
-ssize_t io1_xplained_temperature_handler(coap_pkt_t *pdu, uint8_t *buf, size_t len)
+ssize_t io1_xplained_temperature_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len, void *ctx)
 {
+    (void)ctx;
     memset(response, 0, sizeof(response));
     gcoap_resp_init(pdu, buf, len, COAP_CODE_CONTENT);
     int16_t temperature;
@@ -47,7 +48,7 @@ void read_io1_xplained_temperature(int16_t *temperature)
 {
     char buffer[2] = { 0 };
     /* read temperature register on I2C bus */
-    if (i2c_read_bytes(I2C_INTERFACE, SENSOR_ADDR, buffer, 2) < 0) {
+    if (i2c_read_bytes(I2C_INTERFACE, SENSOR_ADDR, buffer, 2, 0) < 0) {
         printf("Error: cannot read at address %i on I2C interface %i\n",
                SENSOR_ADDR, I2C_INTERFACE);
         return;
@@ -69,6 +70,7 @@ void read_io1_xplained_temperature(int16_t *temperature)
 
 void *io1_xplained_thread(void *args)
 {
+    (void)args;
     msg_init_queue(_io1_xplained_msg_queue, IO1_XPLAINED_QUEUE_SIZE);
     
     for(;;) {
@@ -87,17 +89,6 @@ void *io1_xplained_thread(void *args)
 
 void init_io1_xplained_temperature_sender(void)
 {
-    int init = i2c_init_master(I2C_INTERFACE, I2C_SPEED_NORMAL);
-    if (init == -1) {
-        puts("Error: Init: Given device not available\n");
-    }
-    else if (init == -2) {
-        puts("Error: Init: Unsupported speed value\n");
-    }
-    else {
-        printf("I2C interface %i successfully initialized as master!\n", I2C_INTERFACE);
-    }
-
     /* create the sensors thread that will send periodic updates to
        the server */
     int io1_xplained_pid = thread_create(io1_xplained_stack, sizeof(io1_xplained_stack),

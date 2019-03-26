@@ -11,7 +11,7 @@ extern "C" {
 
 void read_imu_values(void);
 
-ssize_t coap_imu_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len);
+ssize_t coap_imu_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len, void *ctx);
 
 void init_imu_sender(void);
 

@@ -35,8 +35,9 @@ static uint8_t response[64] = { 0 };
 static bool use_temperature = false;
 static bool use_pressure = false;
 
-ssize_t bmp180_temperature_handler(coap_pkt_t *pdu, uint8_t *buf, size_t len)
+ssize_t bmp180_temperature_handler(coap_pkt_t *pdu, uint8_t *buf, size_t len, void *ctx)
 {
+    (void)ctx;
     gcoap_resp_init(pdu, buf, len, COAP_CODE_CONTENT);
     memset(response, 0, sizeof(response));
     int32_t temperature = bmp180_read_temperature(&bmp180_dev);
@@ -47,8 +48,9 @@ ssize_t bmp180_temperature_handler(coap_pkt_t *pdu, uint8_t *buf, size_t len)
     return gcoap_finish(pdu, payload_len, COAP_FORMAT_TEXT);
 }
 
-ssize_t bmp180_pressure_handler(coap_pkt_t *pdu, uint8_t *buf, size_t len)
+ssize_t bmp180_pressure_handler(coap_pkt_t *pdu, uint8_t *buf, size_t len, void *ctx)
 {
+    (void)ctx;
     gcoap_resp_init(pdu, buf, len, COAP_CODE_CONTENT);
     memset(response, 0, sizeof(response));
     int32_t pressure = bmp180_read_pressure(&bmp180_dev);
@@ -61,6 +63,7 @@ ssize_t bmp180_pressure_handler(coap_pkt_t *pdu, uint8_t *buf, size_t len)
 
 void *bmp180_thread(void *args)
 {
+    (void) args;
     msg_init_queue(_bmp180_msg_queue, BMP180_QUEUE_SIZE);
 
     for(;;) {

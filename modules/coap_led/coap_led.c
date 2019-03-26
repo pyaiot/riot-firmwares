@@ -16,8 +16,9 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
-ssize_t led_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len)
+ssize_t led_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len, void *ctx)
 {
+    (void)ctx;
     ssize_t p = 0;
     char rsp[16];
     unsigned code = COAP_CODE_EMPTY;

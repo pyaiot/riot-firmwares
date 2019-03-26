@@ -9,7 +9,7 @@
 extern "C" {
 #endif
 
-ssize_t tsl2561_illuminance_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len);
+ssize_t tsl2561_illuminance_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len, void *ctx);
 
 void init_tsl2561_sender(void);
 

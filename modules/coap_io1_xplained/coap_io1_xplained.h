@@ -9,7 +9,7 @@
 extern "C" {
 #endif
 
-ssize_t io1_xplained_temperature_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len);
+ssize_t io1_xplained_temperature_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len, void *ctx);
 
 void read_io1_xplained_temperature(int16_t* temperature);
 

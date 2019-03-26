@@ -45,6 +45,7 @@ void get_name(char *value) {
 
 void *beaconing_thread(void *args)
 {
+    (void) args;
     char id[64] = { 0 };
     msg_init_queue(_beaconing_msg_queue, BEACONING_QUEUE_SIZE);
     for(;;) {

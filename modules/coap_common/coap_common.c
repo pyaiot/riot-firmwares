@@ -22,8 +22,9 @@
 static msg_t _beaconing_msg_queue[BEACONING_QUEUE_SIZE];
 static char beaconing_stack[THREAD_STACKSIZE_DEFAULT];
 
-ssize_t name_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len)
+ssize_t name_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len, void *ctx)
 {
+    (void)ctx;
     DEBUG("[DEBUG] common: replying to 'name' request\n");
     gcoap_resp_init(pdu, buf, len, COAP_CODE_CONTENT);
     size_t payload_len = strlen(APPLICATION_NAME);
@@ -32,8 +33,9 @@ ssize_t name_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len)
     return gcoap_finish(pdu, payload_len, COAP_FORMAT_TEXT);
 }
 
-ssize_t board_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len)
+ssize_t board_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len, void *ctx)
 {
+    (void)ctx;
     DEBUG("[DEBUG] common: replying to 'board' request\n");
     gcoap_resp_init(pdu, buf, len, COAP_CODE_CONTENT);
     const char *board = RIOT_BOARD;
@@ -43,8 +45,9 @@ ssize_t board_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len)
     return gcoap_finish(pdu, payload_len, COAP_FORMAT_TEXT);
 }
 
-ssize_t mcu_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len)
+ssize_t mcu_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len, void *ctx)
 {
+    (void)ctx;
     DEBUG("[DEBUG] common: replying to 'mcu' request\n");
     gcoap_resp_init(pdu, buf, len, COAP_CODE_CONTENT);
     const char *mcu = RIOT_MCU;
@@ -54,8 +57,9 @@ ssize_t mcu_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len)
     return gcoap_finish(pdu, payload_len, COAP_FORMAT_TEXT);
 }
 
-ssize_t os_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len)
+ssize_t os_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len, void *ctx)
 {
+    (void)ctx;
     DEBUG("[DEBUG] common: replying to 'os' request\n");
     gcoap_resp_init(pdu, buf, len, COAP_CODE_CONTENT);
     const char *os = "riot";
@@ -67,6 +71,7 @@ ssize_t os_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len)
 
 void *beaconing_thread(void *args)
 {
+    (void)args;
     msg_init_queue(_beaconing_msg_queue, BEACONING_QUEUE_SIZE);
 
     for(;;) {

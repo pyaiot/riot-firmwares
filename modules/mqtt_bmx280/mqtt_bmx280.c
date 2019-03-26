@@ -67,6 +67,7 @@ void get_humidity(char *value) {
 
 void *publish_thread(void *args)
 {
+    (void)args;
     char topic[64] = { 0 };
     char payload[64] = { 0 };
 

@@ -37,8 +37,9 @@ static bool use_pressure = false;
 static bool use_humidity = false;
 #endif
 
-ssize_t bmx280_temperature_handler(coap_pkt_t *pdu, uint8_t *buf, size_t len)
+ssize_t bmx280_temperature_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len, void *ctx)
 {
+    (void)ctx;
     ssize_t p = 0;
     gcoap_resp_init(pdu, buf, len, COAP_CODE_CONTENT);
     memset(response, 0, sizeof(response));
@@ -56,8 +57,9 @@ ssize_t bmx280_temperature_handler(coap_pkt_t *pdu, uint8_t *buf, size_t len)
     return gcoap_finish(pdu, p, COAP_FORMAT_TEXT);
 }
 
-ssize_t bmx280_pressure_handler(coap_pkt_t *pdu, uint8_t *buf, size_t len)
+ssize_t bmx280_pressure_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len, void *ctx)
 {
+    (void)ctx;
     ssize_t p = 0;
     gcoap_resp_init(pdu, buf, len, COAP_CODE_CONTENT);
     memset(response, 0, sizeof(response));
@@ -72,8 +74,9 @@ ssize_t bmx280_pressure_handler(coap_pkt_t *pdu, uint8_t *buf, size_t len)
 }
 
 #ifdef MODULE_BME280
-ssize_t bmx280_humidity_handler(coap_pkt_t *pdu, uint8_t *buf, size_t len)
+ssize_t bmx280_humidity_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len, void *ctx)
 {
+    (void)ctx;
     ssize_t p = 0;
     gcoap_resp_init(pdu, buf, len, COAP_CODE_CONTENT);
     memset(response, 0, sizeof(response));
@@ -90,6 +93,7 @@ ssize_t bmx280_humidity_handler(coap_pkt_t *pdu, uint8_t *buf, size_t len)
 
 void *bmx280_thread(void *args)
 {
+    (void)args;
     msg_init_queue(_bmx280_msg_queue, BMX280_QUEUE_SIZE);
 
     for(;;) {

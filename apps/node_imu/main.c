@@ -11,7 +11,7 @@
 
 #include "board.h"
 #include "shell.h"
-#include "nanocoap.h"
+#include "net/nanocoap.h"
 #include "net/gcoap.h"
 
 /* RIOT firmware libraries */
@@ -26,15 +26,15 @@ static const shell_command_t shell_commands[] = {
 static msg_t _main_msg_queue[MAIN_QUEUE_SIZE];
 
 /* import "ifconfig" shell command, used for printing addresses */
-extern int _netif_config(int argc, char **argv);
+extern int _gnrc_netif_config(int argc, char **argv);
 
 /* CoAP resources (alphabetical order) */
 static const coap_resource_t _resources[] = {
-    { "/board", COAP_GET, board_handler },
-    { "/imu", COAP_GET, coap_imu_handler },
-    { "/mcu", COAP_GET, mcu_handler },
-    { "/name", COAP_GET, name_handler },
-    { "/os", COAP_GET, os_handler },
+    { "/board", COAP_GET, board_handler, NULL },
+    { "/imu", COAP_GET, coap_imu_handler, NULL },
+    { "/mcu", COAP_GET, mcu_handler, NULL },
+    { "/name", COAP_GET, name_handler, NULL },
+    { "/os", COAP_GET, os_handler, NULL },
 };
 
 static gcoap_listener_t _listener = {
@@ -55,7 +55,7 @@ int main(void)
 
     /* print network addresses */
     puts("Configured network interfaces:");
-    _netif_config(0, NULL);
+    _gnrc_netif_config(0, NULL);
 
     /* start coap server loop */
     gcoap_register_listener(&_listener);
