@@ -11,4 +11,4 @@ install:
     - make init_submodules
 
 script:
-    - make
+    - make BUILD_IN_DOCKER=1
