@@ -1,4 +1,4 @@
-# name of your application
+# Name of your application
 APPLICATION = node_bmx280
 
 # If no BOARD is found in the environment, use this default:
@@ -9,15 +9,12 @@ DRIVER ?= bme280
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../../RIOT
 
-# Application specific modules
+# Riot Application modules
 USEMODULE += printf_float
 USEMODULE += $(DRIVER)
+USEMODULE += shell_common
 
-# include this to get the shell
-USEMODULE += shell_commands
-USEMODULE += shell
-USEMODULE += ps
-
+# Include pyaiot modules
 USEMODULE += coap_common
 USEMODULE += coap_utils
 USEMODULE += coap_position

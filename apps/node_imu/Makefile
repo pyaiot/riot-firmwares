@@ -1,4 +1,4 @@
-# name of your application
+# Name of your application
 APPLICATION = node_imu
 
 # If no BOARD is found in the environment, use this default:
@@ -8,11 +8,10 @@ BOARD = iotlab-m3
 RIOTBASE ?= $(CURDIR)/../../RIOT
 
 # include this to get the shell
-USEMODULE += shell_commands
-USEMODULE += shell
-USEMODULE += ps
-
+USEMODULE += shell_common
 USEMODULE += xtimer
+
+# Required Features
 FEATURES_REQUIRED += periph_gpio
 
 # Add the sensors
@@ -20,6 +19,7 @@ USEMODULE += saul_reg
 USEMODULE += saul_default
 USEMODULE += auto_init_saul
 
+# Include pyaiot modules
 USEMODULE += coap_common
 USEMODULE += coap_utils
 USEMODULE += coap_imu

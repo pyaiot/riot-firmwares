@@ -1,4 +1,4 @@
-# name of your application
+# Name of your application
 APPLICATION = node_io1_xplained
 
 # If no BOARD is found in the environment, use this default:
@@ -7,15 +7,14 @@ BOARD = samr21-xpro
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../../RIOT
 
-# include this to get the shell
-USEMODULE += shell_commands
-USEMODULE += shell
-USEMODULE += ps
-
+# Riot Application modules
+USEMODULE += shell_common
 USEMODULE += xtimer
 
+# Required Features
 FEATURES_REQUIRED += periph_i2c
 
+# Include pyaiot modules
 USEMODULE += coap_common
 USEMODULE += coap_utils
 USEMODULE += coap_io1_xplained
