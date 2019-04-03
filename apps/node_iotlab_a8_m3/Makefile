@@ -7,26 +7,14 @@ BOARD = iotlab-a8-m3
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../../RIOT
 
-# Include packages that pull up and auto-init the link layer.
-# NOTE: 6LoWPAN will be included if IEEE802.15.4 devices are present
-USEMODULE += gnrc_netdev_default
-USEMODULE += auto_init_gnrc_netif
-# Specify the mandatory networking modules for IPv6 and UDP
-USEMODULE += gnrc_ipv6_default
-# Additional networking modules that can be dropped if not needed
-USEMODULE += gnrc_icmpv6_echo
+# Application specific modules
 USEMODULE += printf_float
-USEMODULE += gnrc_sock_udp
 USEMODULE += lsm303dlhc
 
-USEMODULE += gcoap
-
-# include this to get the shell
+# include this to get the shell with common functionalities
 USEMODULE += shell_commands
 USEMODULE += shell
 USEMODULE += ps
-USEMODULE += netstats_l2
-USEMODULE += netstats_ipv6
 
 USEMODULE += coap_common
 USEMODULE += coap_utils
@@ -37,6 +25,11 @@ USEMODULE += coap_iotlab_a8_m3
 # Change this to 0 show compiler invocation lines by default:
 QUIET ?= 1
 
+# Needed because of unuesed variuable in stm32_common/perip/i2c_2.c
+# Fixed in Master but waiting for 2019.04-branch release that has the
+# bug fix
+DEVELHELP ?= 1
+
 # Application specific definitions and includes
 APPLICATION_NAME ?= "IoT-Lab\ A8\ Node"
 NODE_LAT ?= 48.714784
@@ -45,20 +38,8 @@ NODE_LNG ?= 2.205502
 BROKER_ADDR ?= 2001:660:3207:102::4
 BROKER_PORT ?= 5683
 
-DIRS += $(CURDIR)/../../modules/coap_common
-INCLUDES += -I$(CURDIR)/../../modules/coap_common
-
-DIRS += $(CURDIR)/../../modules/coap_utils
-INCLUDES += -I$(CURDIR)/../../modules/coap_utils
-
-DIRS += $(CURDIR)/../../modules/coap_position
-INCLUDES += -I$(CURDIR)/../../modules/coap_position
-
-DIRS += $(CURDIR)/../../modules/coap_led
-INCLUDES += -I$(CURDIR)/../../modules/coap_led
-
-DIRS += $(CURDIR)/../../modules/coap_iotlab_a8_m3
-INCLUDES += -I$(CURDIR)/../../modules/coap_iotlab_a8_m3
+include $(CURDIR)/../Makefile.dep
+include $(CURDIR)/../Makefile.include
 
 include $(RIOTBASE)/Makefile.include
 

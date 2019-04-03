@@ -7,18 +7,7 @@ BOARD ?= samr21-xpro
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../../RIOT
 
-# Include packages that pull up and auto-init the link layer.
-# NOTE: 6LoWPAN will be included if IEEE802.15.4 devices are present
-USEMODULE += gnrc_netdev_default
-USEMODULE += auto_init_gnrc_netif
-# Specify the mandatory networking modules for IPv6 and UDP
-USEMODULE += gnrc_ipv6_default
-# Additional networking modules that can be dropped if not needed
-USEMODULE += gnrc_icmpv6_echo
-USEMODULE += gnrc_sock_udp
-
-USEMODULE += gcoap
-
+# Application specific modules
 USEMODULE += xtimer
 USEMODULE += fmt
 
@@ -26,8 +15,6 @@ USEMODULE += fmt
 USEMODULE += shell_commands
 USEMODULE += shell
 USEMODULE += ps
-USEMODULE += netstats_l2
-USEMODULE += netstats_ipv6
 
 FEATURES_REQUIRED += periph_gpio
 
@@ -44,14 +31,8 @@ APPLICATION_NAME ?= "Node\ LED"
 BROKER_ADDR ?= 2001:660:3207:102::4
 BROKER_PORT ?= 5683
 
-DIRS += $(CURDIR)/../../modules/coap_common
-INCLUDES += -I$(CURDIR)/../../modules/coap_common
-
-DIRS += $(CURDIR)/../../modules/coap_utils
-INCLUDES += -I$(CURDIR)/../../modules/coap_utils
-
-DIRS += $(CURDIR)/../../modules/coap_led
-INCLUDES += -I$(CURDIR)/../../modules/coap_led
+include $(CURDIR)/../Makefile.dep
+include $(CURDIR)/../Makefile.include
 
 include $(RIOTBASE)/Makefile.include
 
