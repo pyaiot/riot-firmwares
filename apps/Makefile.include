@@ -1,0 +1,75 @@
+ifneq (,$(filter coap_bmp180, $(USEMODULE)))
+DIRS += $(CURDIR)/../../modules/coap_bmp180
+INCLUDES += -I$(CURDIR)/../../modules/coap_bmp180
+endif
+
+ifneq (,$(filter coap_bmx280, $(USEMODULE)))
+DIRS += $(CURDIR)/../../modules/coap_bmx280
+INCLUDES += -I$(CURDIR)/../../modules/coap_bmx280
+endif
+
+ifneq (,$(filter coap_ccs811, $(USEMODULE)))
+DIRS += $(CURDIR)/../../modules/coap_ccs811
+INCLUDES += -I$(CURDIR)/../../modules/coap_ccs811
+endif
+
+ifneq (,$(filter coap_common, $(USEMODULE)))
+DIRS += $(CURDIR)/../../modules/coap_common
+INCLUDES += -I$(CURDIR)/../../modules/coap_common
+endif
+
+ifneq (,$(filter coap_imu, $(USEMODULE)))
+DIRS += $(CURDIR)/../../modules/coap_imu
+INCLUDES += -I$(CURDIR)/../../modules/coap_imu
+endif
+
+ifneq (,$(filter coap_iotlab_a8_m3, $(USEMODULE)))
+DIRS += $(CURDIR)/../../modules/coap_iotlab_a8_m3
+INCLUDES += -I$(CURDIR)/../../modules/coap_iotlab_a8_m3
+endif
+
+ifneq (,$(filter coap_io1_xplained, $(USEMODULE)))
+DIRS += $(CURDIR)/../../modules/coap_io1_xplained
+INCLUDES += -I$(CURDIR)/../../modules/coap_io1_xplained
+endif
+
+ifneq (,$(filter coap_led, $(USEMODULE)))
+DIRS += $(CURDIR)/../../modules/coap_led
+INCLUDES += -I$(CURDIR)/../../modules/coap_led
+endif
+
+ifneq (,$(filter coap_position, $(USEMODULE)))
+DIRS += $(CURDIR)/../../modules/coap_position
+INCLUDES += -I$(CURDIR)/../../modules/coap_position
+endif
+
+ifneq (,$(filter coap_suit, $(USEMODULE)))
+DIRS += $(CURDIR)/../../modules/coap_suit
+INCLUDES += -I$(CURDIR)/../../modules/coap_suit
+include $(CURDIR)/../../modules/coap_suit/Makefile.include
+endif
+
+ifneq (,$(filter coap_tsl2561, $(USEMODULE)))
+DIRS += $(CURDIR)/../../modules/coap_tsl2561
+INCLUDES += -I$(CURDIR)/../../modules/coap_tsl2561
+endif
+
+ifneq (,$(filter coap_utils, $(USEMODULE)))
+DIRS += $(CURDIR)/../../modules/coap_utils
+INCLUDES += -I$(CURDIR)/../../modules/coap_utils
+endif
+
+ifneq (,$(filter mqtt_common, $(USEMODULE)))
+DIRS += $(CURDIR)/../../modules/mqtt_common
+INCLUDES += -I$(CURDIR)/../../modules/mqtt_common
+endif
+
+ifneq (,$(filter mqtt_bmx280, $(USEMODULE)))
+DIRS += $(CURDIR)/../../modules/mqtt_bmx280
+INCLUDES += -I$(CURDIR)/../../modules/mqtt_bmx280
+endif
+
+ifneq (,$(filter mqtt_utils, $(USEMODULE)))
+DIRS += $(CURDIR)/../../modules/mqtt_utils
+INCLUDES += -I$(CURDIR)/../../modules/mqtt_utils
+endif

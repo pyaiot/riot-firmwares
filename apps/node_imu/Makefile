@@ -7,27 +7,12 @@ BOARD = iotlab-m3
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../../RIOT
 
-# Include packages that pull up and auto-init the link layer.
-# NOTE: 6LoWPAN will be included if IEEE802.15.4 devices are present
-USEMODULE += gnrc_netdev_default
-USEMODULE += auto_init_gnrc_netif
-# Specify the mandatory networking modules for IPv6 and UDP
-USEMODULE += gnrc_ipv6_default
-# Additional networking modules that can be dropped if not needed
-USEMODULE += gnrc_icmpv6_echo
-USEMODULE += gnrc_sock_udp
-
-USEMODULE += gcoap
-
 # include this to get the shell
 USEMODULE += shell_commands
 USEMODULE += shell
 USEMODULE += ps
-USEMODULE += netstats_l2
-USEMODULE += netstats_ipv6
 
 USEMODULE += xtimer
-
 FEATURES_REQUIRED += periph_gpio
 
 # Add the sensors
@@ -39,6 +24,11 @@ USEMODULE += coap_common
 USEMODULE += coap_utils
 USEMODULE += coap_imu
 
+# Needed because of unuesed variuable in stm32_common/perip/i2c_2.c
+# Fixed in Master but waiting for 2019.04-branch release that has the
+# bug fix
+DEVELHELP ?= 1
+
 # Change this to 0 show compiler invocation lines by default:
 QUIET ?= 1
 
@@ -48,14 +38,8 @@ APPLICATION_NAME ?= "IMU\ Unit"
 BROKER_ADDR ?= 2001:660:3207:102::4
 BROKER_PORT ?= 5683
 
-DIRS += $(CURDIR)/../../modules/coap_common
-INCLUDES += -I$(CURDIR)/../../modules/coap_common
-
-DIRS += $(CURDIR)/../../modules/coap_utils
-INCLUDES += -I$(CURDIR)/../../modules/coap_utils
-
-DIRS += $(CURDIR)/../../modules/coap_imu
-INCLUDES += -I$(CURDIR)/../../modules/coap_imu
+include $(CURDIR)/../Makefile.dep
+include $(CURDIR)/../Makefile.include
 
 include $(RIOTBASE)/Makefile.include
 

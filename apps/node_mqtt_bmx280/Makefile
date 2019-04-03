@@ -9,23 +9,10 @@ DRIVER ?= bme280
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../../RIOT
 
-# Include packages that pull up and auto-init the link layer.
-# NOTE: 6LoWPAN will be included if IEEE802.15.4 devices are present
-USEMODULE += gnrc_netdev_default
-USEMODULE += auto_init_gnrc_netif
-# Specify the mandatory networking modules for IPv6 and UDP
-USEMODULE += gnrc_sock_udp
-USEMODULE += gnrc_icmpv6_echo
-USEMODULE += gnrc_ipv6_default
-# Include MQTT-SN
-USEMODULE += emcute
-
 # include this to get the shell
 USEMODULE += shell_commands
 USEMODULE += shell
 USEMODULE += ps
-USEMODULE += netstats_l2
-USEMODULE += netstats_ipv6
 
 USEMODULE += mqtt_utils
 USEMODULE += mqtt_common
@@ -42,14 +29,8 @@ APPLICATION_NAME ?= "Node\ BME280\ MQTT-SN"
 GATEWAY_ADDR ?= fd00:abad:1e:102::1
 GATEWAY_PORT ?= 1885
 
-DIRS += $(CURDIR)/../../modules/mqtt_common
-INCLUDES += -I$(CURDIR)/../../modules/mqtt_common
-
-DIRS += $(CURDIR)/../../modules/mqtt_bmx280
-INCLUDES += -I$(CURDIR)/../../modules/mqtt_bmx280
-
-DIRS += $(CURDIR)/../../modules/mqtt_utils
-INCLUDES += -I$(CURDIR)/../../modules/mqtt_utils
+include $(CURDIR)/../Makefile.dep
+include $(CURDIR)/../Makefile.include
 
 include $(RIOTBASE)/Makefile.include
 
