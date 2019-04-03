@@ -44,29 +44,28 @@ All firmwares source codes are based on [RIOT](https://github.com/RIOT-OS/RIOT).
 RIOT is included as a submodule of this repository. We provide a `make` helper
 target to initialize it.
 From the root of this repository, issue the following command:
-```
-$ make init_submodules
-```
+
+    $ make init_submodules
+
 
 #### Building the firmwares:
 
 From the root directory of this repository, simply issue the following command:
-```
-$ make
-```
+
+    $ make
+
 
 #### Flashing the firmwares
 
 For each firmwares use the RIOT way of flashing them. For example, in
 `apps/node_bmp180`, use:
-```
-$ make -C apps/node_bmp180 flash
-```
+
+    $ make -C apps/node_bmp180 flash
+
 to flash the firmware on a SAMR21 XPlained Pro board.
 
 #### Global cleanup of the generated firmwares
 
 From the root directory of this repository, issue the following command:
-```
-$ make clean
-```
+
+    $ make clean
