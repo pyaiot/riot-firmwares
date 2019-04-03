@@ -16,7 +16,7 @@ USEMODULE += auto_init_gnrc_netif
 # Specify the mandatory networking modules for IPv6 and UDP
 USEMODULE += gnrc_sock_udp
 USEMODULE += gnrc_icmpv6_echo
-USEMODULE += gnrc_ipv6_router_default
+USEMODULE += gnrc_ipv6_default
 # Include MQTT-SN
 USEMODULE += emcute
 
