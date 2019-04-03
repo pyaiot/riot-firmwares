@@ -34,6 +34,8 @@ The available firmwares are:
   from a
   [BME280](https://www.bosch-sensortec.com/bst/products/all_products/bme280)
   sensor. Values are raised using the MQTT-SN protocol.
+* [CCS811 sensor (CoAP)](apps/node_ccs811): read gas sensor values from a
+  [CCS811](https://ams.com/ccs811) sensor.
 
 All firmwares source codes are based on [RIOT](https://github.com/RIOT-OS/RIOT).
 
