@@ -1,4 +1,4 @@
-# name of your application
+# Name of your application
 APPLICATION = node_mqtt_bmx280
 
 # If no BOARD is found in the environment, use this default:
@@ -9,11 +9,10 @@ DRIVER ?= bme280
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../../RIOT
 
-# include this to get the shell
-USEMODULE += shell_commands
-USEMODULE += shell
-USEMODULE += ps
+# Riot Application modules
+USEMODULE += shell_common
 
+# Include pyaiot modules
 USEMODULE += mqtt_utils
 USEMODULE += mqtt_common
 USEMODULE += mqtt_bmx280

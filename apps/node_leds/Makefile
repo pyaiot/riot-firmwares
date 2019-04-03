@@ -7,17 +7,15 @@ BOARD ?= samr21-xpro
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../../RIOT
 
-# Application specific modules
+# Riot Application modules
+USEMODULE += shell_common
 USEMODULE += xtimer
 USEMODULE += fmt
 
-# include this to get the shell
-USEMODULE += shell_commands
-USEMODULE += shell
-USEMODULE += ps
-
+# Required Features
 FEATURES_REQUIRED += periph_gpio
 
+# Include pyaiot modules
 USEMODULE += coap_common
 USEMODULE += coap_utils
 USEMODULE += coap_led

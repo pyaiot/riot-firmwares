@@ -1,4 +1,4 @@
-# name of your application
+# Name of your application
 APPLICATION = node_empty
 
 # If no BOARD is found in the environment, use this default:
@@ -8,10 +8,9 @@ BOARD ?= samr21-xpro
 RIOTBASE ?= $(CURDIR)/../../RIOT
 
 # include this to get the shell
-USEMODULE += shell_commands
-USEMODULE += shell
-USEMODULE += ps
+USEMODULE += shell_common
 
+# Include pyaiot modules
 USEMODULE += coap_common
 USEMODULE += coap_utils
 USEMODULE += coap_position

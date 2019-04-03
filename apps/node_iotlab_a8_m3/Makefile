@@ -7,15 +7,12 @@ BOARD = iotlab-a8-m3
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../../RIOT
 
-# Application specific modules
+# Riot Application modules
 USEMODULE += printf_float
 USEMODULE += lsm303dlhc
+USEMODULE += shell_common
 
-# include this to get the shell with common functionalities
-USEMODULE += shell_commands
-USEMODULE += shell
-USEMODULE += ps
-
+# Include pyaiot modules
 USEMODULE += coap_common
 USEMODULE += coap_utils
 USEMODULE += coap_led

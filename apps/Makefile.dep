@@ -1,3 +1,5 @@
+PSEUDOMODULES += shell_common
+
 ifneq (,$(filter coap_% mqtt_%,$(USEMODULE)))
   # Include packages that pull up and auto-init the link layer.
   # NOTE: 6LoWPAN will be included if IEEE802.15.4 devices are present
@@ -16,4 +18,10 @@ endif
 
 ifneq (,$(filter mqtt_%,$(USEMODULE)))
   USEMODULE += emcute
+endif
+
+ifneq (,$(filter shell_common,$(USEMODULE)))
+  USEMODULE += shell_commands
+  USEMODULE += shell
+  USEMODULE += ps
 endif
