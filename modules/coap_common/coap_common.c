@@ -3,7 +3,10 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "fmt.h"
+#include "luid.h"
 #include "thread.h"
+#include "net/ieee802154.h"
 #include "net/gcoap.h"
 
 #include "coap_common.h"
@@ -71,12 +74,16 @@ ssize_t os_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len, void *ctx)
 
 void *beaconing_thread(void *args)
 {
-    (void)args;
     msg_init_queue(_beaconing_msg_queue, BEACONING_QUEUE_SIZE);
+
+    char *uid = (char *)args;
+    size_t msg_len = strlen("alive:") + (IEEE802154_LONG_ADDRESS_LEN * 2);
+    char alive_msg[msg_len];
+    snprintf(alive_msg, msg_len, "alive:%s", uid);
 
     for(;;) {
         DEBUG("[DEBUG] common: sending beacon\n");
-        send_coap_post((uint8_t*)"/alive", (uint8_t*)"Alive");
+        send_coap_post((uint8_t*)"/alive", (uint8_t*)alive_msg);
         /* wait 30 seconds */
         xtimer_usleep(BEACON_INTERVAL);
     }
@@ -85,14 +92,22 @@ void *beaconing_thread(void *args)
 
 void init_beacon_sender(void)
 {
-    send_coap_post((uint8_t*)"/alive", (uint8_t*)"reset");
+    uint8_t addr[IEEE802154_LONG_ADDRESS_LEN];
+    char uid[IEEE802154_LONG_ADDRESS_LEN * 2];
+    luid_get(addr, IEEE802154_LONG_ADDRESS_LEN);
+    fmt_bytes_hex(uid, addr, IEEE802154_LONG_ADDRESS_LEN);
+    size_t msg_len = strlen("reset:") + (IEEE802154_LONG_ADDRESS_LEN * 2);
+    char reset_msg[msg_len];
+    snprintf(reset_msg, msg_len, "reset:%s", uid);
+
+    send_coap_post((uint8_t*)"/alive", (uint8_t*)reset_msg);
 
     /* create the beaconning thread that will send periodic messages to
        the broker */
     int beacon_pid = thread_create(beaconing_stack, sizeof(beaconing_stack),
                                    THREAD_PRIORITY_MAIN - 1,
                                    THREAD_CREATE_STACKTEST, beaconing_thread,
-                                   NULL, "Beaconing thread");
+                                   uid, "Beaconing thread");
     if (beacon_pid == -EINVAL || beacon_pid == -EOVERFLOW) {
         puts("Error: failed to create beaconing thread, exiting\n");
     }
