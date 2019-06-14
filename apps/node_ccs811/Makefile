@@ -16,6 +16,7 @@ USEMODULE += coap_common
 USEMODULE += coap_utils
 USEMODULE += coap_position
 USEMODULE += coap_ccs811
+USEMODULE += schedreg
 
 # Change this to 0 show compiler invocation lines by default:
 QUIET ?= 1
