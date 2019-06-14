@@ -17,6 +17,7 @@ ssize_t bmx280_humidity_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len, void 
 #endif
 
 void init_bmx280_sender(bool temperature, bool pressure, bool humidity);
+void bmx280_handler(void *args);
 
 #ifdef __cplusplus
 }
