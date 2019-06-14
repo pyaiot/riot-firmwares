@@ -19,11 +19,13 @@
 #define APPLICATION_NAME "Node"
 #endif
 
+#ifndef MODULE_SCHEDREG
 #define BEACON_INTERVAL       (30000000U)    /* set interval to 30 seconds */
 
 #define BEACONING_QUEUE_SIZE  (8U)
 static msg_t _beaconing_msg_queue[BEACONING_QUEUE_SIZE];
 static char beaconing_stack[THREAD_STACKSIZE_DEFAULT];
+#endif
 
 ssize_t name_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len, void *ctx)
 {
@@ -72,6 +74,21 @@ ssize_t os_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len, void *ctx)
     return gcoap_finish(pdu, payload_len, COAP_FORMAT_TEXT);
 }
 
+void beacon_handler(void *arg)
+{
+    (void) arg;
+    uint8_t addr[IEEE802154_LONG_ADDRESS_LEN];
+    char uid[IEEE802154_LONG_ADDRESS_LEN * 2];
+    luid_get(addr, IEEE802154_LONG_ADDRESS_LEN);
+    fmt_bytes_hex(uid, addr, IEEE802154_LONG_ADDRESS_LEN);
+    size_t msg_len = strlen("alive:") + (IEEE802154_LONG_ADDRESS_LEN * 2);
+    char alive_msg[msg_len];
+    snprintf(alive_msg, msg_len, "alive:%s", uid);
+    /* Schedule next transmission */
+    send_coap_post((uint8_t*)"/alive", (uint8_t*)alive_msg);
+}
+
+#ifndef MODULE_SCHEDREG
 void *beaconing_thread(void *args)
 {
     msg_init_queue(_beaconing_msg_queue, BEACONING_QUEUE_SIZE);
@@ -89,6 +106,7 @@ void *beaconing_thread(void *args)
     }
     return NULL;
 }
+#endif
 
 void init_beacon_sender(void)
 {
@@ -99,9 +117,9 @@ void init_beacon_sender(void)
     size_t msg_len = strlen("reset:") + (IEEE802154_LONG_ADDRESS_LEN * 2);
     char reset_msg[msg_len];
     snprintf(reset_msg, msg_len, "reset:%s", uid);
-
     send_coap_post((uint8_t*)"/alive", (uint8_t*)reset_msg);
 
+#ifndef MODULE_SCHEDREG
     /* create the beaconning thread that will send periodic messages to
        the broker */
     int beacon_pid = thread_create(beaconing_stack, sizeof(beaconing_stack),
@@ -112,6 +130,7 @@ void init_beacon_sender(void)
         puts("Error: failed to create beaconing thread, exiting\n");
     }
     else {
-        puts("Successfuly created beaconing thread !\n");
+        puts("Successfully created beaconing thread !\n");
     }
+#endif
 }
