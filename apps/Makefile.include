@@ -73,3 +73,9 @@ ifneq (,$(filter mqtt_utils, $(USEMODULE)))
 DIRS += $(CURDIR)/../../modules/mqtt_utils
 INCLUDES += -I$(CURDIR)/../../modules/mqtt_utils
 endif
+
+ifneq (,$(filter schedreg, $(USEMODULE)))
+DIRS += $(CURDIR)/../../modules/schedreg
+INCLUDES += -I$(CURDIR)/../../modules/schedreg
+endif
+
