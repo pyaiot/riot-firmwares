@@ -5,11 +5,11 @@ all: build
 
 # Clean all firmwares
 clean:
-	for fw in `ls apps`; do make -C apps/$$fw distclean; done
+	for fw in `ls -d apps/*/`; do make -C $$fw distclean; done
 
 # Build all firmwares
 build:
-	for fw in `ls apps`; do make -C apps/$$fw all; done
+	for fw in `ls -d apps/*/`; do make -C $$fw all; done
 
 init_submodules:
 	git submodule update --init --recursive
